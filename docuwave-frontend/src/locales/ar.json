@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "scanner": "الماسح الضوئي",
+    "workflowDesigner": "مصمم سير العمل",
+    "workflowTemplates": "قوالب سير العمل",
+    "formioBuilder": "منشئ النماذج",
+    "documentViewer": "عارض المستندات",
+    "aiConfiguration": "إعدادات الذكاء الاصطناعي",
+    "repositories": "المستودعات"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "totalDocuments": "إجمالي المستندات",
+    "processed": "تمت المعالجة",
+    "pending": "قيد الانتظار",
+    "failed": "فشل",
+    "actions": "الإجراءات",
+    "exportCSV": "تصدير CSV",
+    "searchPlaceholder": "البحث عن المستندات...",
+    "deleteConfirm": "هل أنت متأكد؟",
+    "allTypes": "جميع الأنواع",
+    "allStatuses": "جميع الحالات"
+  },
+  "scanner": {
+    "title": "ماسح المستندات",
+    "uploadFiles": "تحميل الملفات",
+    "scanDocument": "مسح المستند",
+    "scanning": "جاري المسح",
+    "scannedDocuments": "المستندات الممسوحة",
+    "processBatch": "معالجة دفعة",
+    "noDocuments": "لا توجد مستندات بعد",
+    "dragDrop": "اسحب وأفلت الملفات هنا",
+    "pages": "صفحات"
+  },
+  "ai": {
+    "title": "إعدادات الذكاء الاصطناعي",
+    "cloudAI": "الذكاء الاصطناعي السحابي",
+    "localAI": "الذكاء الاصطناعي المحلي",
+    "saveConfiguration": "حفظ الإعدادات"
+  },
+  "repo": {
+    "title": "المستودعات",
+    "addRepository": "إضافة مستودع",
+    "connected": "متصل",
+    "testConnection": "اختبار الاتصال"
+  },
+  "common": {
+    "success": "نجح",
+    "error": "خطأ",
+    "warning": "تحذير",
+    "info": "معلومات",
+    "confirm": "تأكيد",
+    "yes": "نعم",
+    "no": "لا",
+    "loading": "جاري التحميل...",
+    "processed": "تمت المعالجة",
+    "pending": "قيد الانتظار",
+    "failed": "فشل",
+    "processing": "قيد المعالجة",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "download": "تنزيل",
+    "upload": "رفع",
+    "search": "بحث",
+    "close": "إغلاق"
+  }
+}

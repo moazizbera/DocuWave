@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "scanner": "Scanner",
+    "workflowDesigner": "Concepteur de flux",
+    "workflowTemplates": "Modèles de flux",
+    "formioBuilder": "Générateur de formulaires",
+    "documentViewer": "Visualiseur de documents",
+    "aiConfiguration": "Configuration IA",
+    "repositories": "Référentiels"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "totalDocuments": "Total documents",
+    "processed": "Traités",
+    "pending": "En attente",
+    "failed": "Échoués",
+    "actions": "Actions",
+    "exportCSV": "Exporter CSV",
+    "searchPlaceholder": "Rechercher des documents...",
+    "deleteConfirm": "Êtes-vous sûr?",
+    "allTypes": "Tous types",
+    "allStatuses": "Tous statuts"
+  },
+  "scanner": {
+    "title": "Scanner de documents",
+    "uploadFiles": "Télécharger des fichiers",
+    "scanDocument": "Scanner le document",
+    "scanning": "Numérisation",
+    "scannedDocuments": "Documents scannés",
+    "processBatch": "Traiter le lot",
+    "noDocuments": "Aucun document encore",
+    "dragDrop": "Glissez-déposez les fichiers ici",
+    "pages": "pages"
+  },
+  "ai": {
+    "title": "Configuration IA",
+    "cloudAI": "IA Cloud",
+    "localAI": "IA Local",
+    "saveConfiguration": "Enregistrer la configuration"
+  },
+  "repo": {
+    "title": "Référentiels",
+    "addRepository": "Ajouter un référentiel",
+    "connected": "Connecté",
+    "testConnection": "Tester la connexion"
+  },
+  "common": {
+    "success": "Succès",
+    "error": "Erreur",
+    "warning": "Attention",
+    "info": "Info",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non",
+    "loading": "Chargement...",
+    "processed": "Traité",
+    "pending": "En attente",
+    "failed": "Échoué",
+    "processing": "En cours",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "search": "Rechercher",
+    "close": "Fermer"
+  }
+}

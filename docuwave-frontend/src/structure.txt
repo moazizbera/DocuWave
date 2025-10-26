@@ -1,0 +1,53 @@
+Folder PATH listing for volume New Volume
+Volume serial number is 915C-0280
+F:.
+¦   App.jsx
+¦   DocuWaveSystem.jsx
+¦   index.js
+¦   structure.txt
+¦   
++---components
+¦   +---common
+¦   ¦       BulkActions.jsx
+¦   ¦       ConfirmDialog.jsx
+¦   ¦       LoadingSkeleton.jsx
+¦   ¦       Modal.jsx
+¦   ¦       StatCard.jsx
+¦   ¦       Toast.jsx
+¦   ¦       UserProfile.jsx
+¦   ¦       WorkflowTemplateLibrary.jsx
+¦   ¦       
+¦   +---layout
+¦   ¦       Sidebar.jsx
+¦   ¦       
+¦   +---workflow
++---contexts
+¦       LanguageContext.jsx
+¦       ThemeContext.jsx
+¦       
++---hooks
+¦       useKeyboardShortcuts.js
+¦       useTranslations.js
+¦       
++---locales
+¦       ar.json
+¦       en.json
+¦       fr.json
+¦       index.js
+¦       
++---pages
+¦       AIConfiguration.jsx
+¦       Dashboard.jsx
+¦       DocumentViewer.jsx
+¦       FormioBuilder.jsx
+¦       Repositories.jsx
+¦       ScannerUI.jsx
+¦       WorkflowDesigner.jsx
+¦       
++---services
+¦       api.js
+¦       
++---styles
+¦       globals.css
+¦       
++---utils

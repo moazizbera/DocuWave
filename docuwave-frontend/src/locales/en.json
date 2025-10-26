@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "scanner": "Scanner",
+    "workflowDesigner": "Workflow Designer",
+    "workflowTemplates": "Workflow Templates",
+    "formioBuilder": "Form Builder",
+    "documentViewer": "Document Viewer",
+    "aiConfiguration": "AI Configuration",
+    "repositories": "Repositories"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalDocuments": "Total Documents",
+    "processed": "Processed",
+    "pending": "Pending",
+    "failed": "Failed",
+    "actions": "Actions",
+    "exportCSV": "Export CSV",
+    "searchPlaceholder": "Search documents...",
+    "deleteConfirm": "Are you sure?",
+    "allTypes": "All Types",
+    "allStatuses": "All Statuses"
+  },
+  "scanner": {
+    "title": "Document Scanner",
+    "uploadFiles": "Upload Files",
+    "scanDocument": "Scan Document",
+    "scanning": "Scanning",
+    "scannedDocuments": "Scanned Documents",
+    "processBatch": "Process Batch",
+    "noDocuments": "No documents yet",
+    "dragDrop": "Drag and drop files here",
+    "pages": "pages"
+  },
+  "ai": {
+    "title": "AI Configuration",
+    "cloudAI": "Cloud AI",
+    "localAI": "Local AI",
+    "saveConfiguration": "Save Configuration"
+  },
+  "repo": {
+    "title": "Repositories",
+    "addRepository": "Add Repository",
+    "connected": "Connected",
+    "testConnection": "Test Connection"
+  },
+  "common": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading...",
+    "processed": "Processed",
+    "pending": "Pending",
+    "failed": "Failed",
+    "processing": "Processing",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "search": "Search",
+    "close": "Close"
+  }
+}

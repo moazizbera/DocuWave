@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using OpenTelemetry.Exporter.Prometheus;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 
@@ -109,7 +110,12 @@ app.MapHub<NotificationHub>("/hubs/notifications");
 app.MapHub<RepositoriesHub>("/hubs/repositories");
 app.MapHub<AnalyticsHub>("/hubs/analytics");
 app.MapHealthChecks("/health");
-app.MapPrometheusScrapingEndpoint();
+app.MapGet("/metrics", async context =>
+{
+    var exporter = context.RequestServices.GetRequiredService<PrometheusExporter>();
+    context.Response.ContentType = "text/plain; version=0.0.4";
+    await exporter.ScrapeResponseAsync(context.Response);
+});
 
 using (var scope = app.Services.CreateScope())
 {

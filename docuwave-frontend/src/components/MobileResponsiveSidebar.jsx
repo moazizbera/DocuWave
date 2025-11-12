@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Grid, Workflow, FileText, Eye, ScanLine, Settings, Database, 
   Moon, Sun, BookTemplate, Building2, Menu, X, BarChart3, Activity,
-  Users, Bell, Search, Plus, Zap,UsersIcon
+  Users, Bell, Search, Plus, Zap
 } from 'lucide-react';
 
 /**
@@ -20,7 +20,7 @@ import {
  * Usage: Replace existing Sidebar component in DocuWaveSystem.jsx
  */
 
-function Sidebar({ 
+function MobileResponsiveSidebar({ 
   activeTab, 
   onTabChange, 
   selectedTenant, 
@@ -430,5 +430,4 @@ function Sidebar({
   );
 }
 
-
-export default Sidebar;
+export default MobileResponsiveSidebar;

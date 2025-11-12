@@ -8,7 +8,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useTranslations } from '../hooks/useTranslations';
 
 /**
- * 🎨 REDESIGNED DASHBOARD - PRODUCTION READY
+ * ðŸŽ¨ REDESIGNED DASHBOARD - PRODUCTION READY
  * ==========================================
  * Modern, professional dashboard with:
  * - Real-time stats with trend indicators
@@ -69,8 +69,8 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
     // TODO: Replace with actual API call
     setDocuments(prev => prev.filter(d => (d.id || d.documentId) !== (doc.id || doc.documentId)));
     showToast(
-      language === 'ar' ? 'تم حذف المستند' : 
-      language === 'fr' ? 'Document supprimé' : 
+      language === 'ar' ? 'ØªÙ… Ø­Ø°Ù Ø§Ù„Ù…Ø³ØªÙ†Ø¯' : 
+      language === 'fr' ? 'Document supprimÃ©' : 
       'Document deleted', 
       'success'
     );
@@ -96,8 +96,8 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
     a.download = `documents_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     showToast(
-      language === 'ar' ? 'تم تصدير CSV' : 
-      language === 'fr' ? 'CSV exporté' : 
+      language === 'ar' ? 'ØªÙ… ØªØµØ¯ÙŠØ± CSV' : 
+      language === 'fr' ? 'CSV exportÃ©' : 
       'CSV exported', 
       'success'
     );
@@ -139,13 +139,13 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
         <div className="flex justify-between items-start mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {language === 'ar' ? `لوحة التحكم - ${tenant.name}` : 
+              {language === 'ar' ? `Ù„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ… - ${tenant.name}` : 
                language === 'fr' ? `Tableau de bord - ${tenant.name}` : 
                `Dashboard - ${tenant.name}`}
             </h1>
             <p className="text-gray-600">
-              {language === 'ar' ? 'نظرة عامة على مستنداتك وأنشطتك' : 
-               language === 'fr' ? 'Aperçu de vos documents et activités' : 
+              {language === 'ar' ? 'Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø© Ø¹Ù„Ù‰ Ù…Ø³ØªÙ†Ø¯Ø§ØªÙƒ ÙˆØ£Ù†Ø´Ø·ØªÙƒ' : 
+               language === 'fr' ? 'AperÃ§u de vos documents et activitÃ©s' : 
                'Overview of your documents and activities'}
             </p>
           </div>
@@ -156,7 +156,7 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             <span className="font-medium">
-              {language === 'ar' ? 'تحديث' : language === 'fr' ? 'Actualiser' : 'Refresh'}
+              {language === 'ar' ? 'ØªØ­Ø¯ÙŠØ«' : language === 'fr' ? 'Actualiser' : 'Refresh'}
             </span>
           </button>
         </div>
@@ -165,7 +165,7 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           <StatCard 
             icon={FileText}
-            label={language === 'ar' ? 'إجمالي المستندات' : language === 'fr' ? 'Total documents' : 'Total Documents'}
+            label={language === 'ar' ? 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª' : language === 'fr' ? 'Total documents' : 'Total Documents'}
             value={stats.total}
             trend={trends.total}
             color="text-blue-600"
@@ -173,7 +173,7 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
           />
           <StatCard 
             icon={CheckCircle}
-            label={language === 'ar' ? 'تمت المعالجة' : language === 'fr' ? 'Traités' : 'Processed'}
+            label={language === 'ar' ? 'ØªÙ…Øª Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø©' : language === 'fr' ? 'TraitÃ©s' : 'Processed'}
             value={stats.processed}
             trend={trends.processed}
             color="text-green-600"
@@ -181,7 +181,7 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
           />
           <StatCard 
             icon={Clock}
-            label={language === 'ar' ? 'قيد الانتظار' : language === 'fr' ? 'En attente' : 'Pending'}
+            label={language === 'ar' ? 'Ù‚ÙŠØ¯ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø±' : language === 'fr' ? 'En attente' : 'Pending'}
             value={stats.pending}
             trend={trends.pending}
             color="text-yellow-600"
@@ -189,7 +189,7 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
           />
           <StatCard 
             icon={XCircle}
-            label={language === 'ar' ? 'فشل' : language === 'fr' ? 'Échoués' : 'Failed'}
+            label={language === 'ar' ? 'ÙØ´Ù„' : language === 'fr' ? 'Ã‰chouÃ©s' : 'Failed'}
             value={stats.failed}
             trend={trends.failed}
             color="text-red-600"
@@ -207,7 +207,7 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
                 type="text" 
                 value={searchQuery} 
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={language === 'ar' ? 'بحث في المستندات...' : language === 'fr' ? 'Rechercher des documents...' : 'Search documents...'}
+                placeholder={language === 'ar' ? 'Ø¨Ø­Ø« ÙÙŠ Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª...' : language === 'fr' ? 'Rechercher des documents...' : 'Search documents...'}
                 className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
               />
             </div>
@@ -218,11 +218,11 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none font-medium text-sm"
             >
-              <option value="all">{language === 'ar' ? 'جميع الحالات' : language === 'fr' ? 'Tous statuts' : 'All Statuses'}</option>
-              <option value="processed">{language === 'ar' ? 'تمت المعالجة' : language === 'fr' ? 'Traités' : 'Processed'}</option>
-              <option value="pending">{language === 'ar' ? 'قيد الانتظار' : language === 'fr' ? 'En attente' : 'Pending'}</option>
-              <option value="processing">{language === 'ar' ? 'قيد المعالجة' : language === 'fr' ? 'En cours' : 'Processing'}</option>
-              <option value="failed">{language === 'ar' ? 'فشل' : language === 'fr' ? 'Échoués' : 'Failed'}</option>
+              <option value="all">{language === 'ar' ? 'Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø­Ø§Ù„Ø§Øª' : language === 'fr' ? 'Tous statuts' : 'All Statuses'}</option>
+              <option value="processed">{language === 'ar' ? 'ØªÙ…Øª Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø©' : language === 'fr' ? 'TraitÃ©s' : 'Processed'}</option>
+              <option value="pending">{language === 'ar' ? 'Ù‚ÙŠØ¯ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø±' : language === 'fr' ? 'En attente' : 'Pending'}</option>
+              <option value="processing">{language === 'ar' ? 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø©' : language === 'fr' ? 'En cours' : 'Processing'}</option>
+              <option value="failed">{language === 'ar' ? 'ÙØ´Ù„' : language === 'fr' ? 'Ã‰chouÃ©s' : 'Failed'}</option>
             </select>
 
             <select 
@@ -230,7 +230,7 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
               onChange={(e) => setTypeFilter(e.target.value)}
               className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none font-medium text-sm"
             >
-              <option value="all">{language === 'ar' ? 'جميع الأنواع' : language === 'fr' ? 'Tous types' : 'All Types'}</option>
+              <option value="all">{language === 'ar' ? 'Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ù†ÙˆØ§Ø¹' : language === 'fr' ? 'Tous types' : 'All Types'}</option>
               {documentTypes.map(type => (
                 <option key={type} value={type}>{type}</option>
               ))}
@@ -243,7 +243,7 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
             >
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">
-                {language === 'ar' ? 'تصدير' : language === 'fr' ? 'Exporter' : 'Export'}
+                {language === 'ar' ? 'ØªØµØ¯ÙŠØ±' : language === 'fr' ? 'Exporter' : 'Export'}
               </span>
             </button>
           </div>
@@ -255,7 +255,7 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
         <div className="p-4 border-b-2 border-gray-100 bg-gray-50">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-900">
-              {language === 'ar' ? 'المستندات' : language === 'fr' ? 'Documents' : 'Documents'} 
+              {language === 'ar' ? 'Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª' : language === 'fr' ? 'Documents' : 'Documents'} 
               <span className="ml-2 text-sm font-normal text-gray-500">
                 ({filteredDocs.length})
               </span>
@@ -266,16 +266,16 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
         {loading ? (
           <div className="p-12 text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-600" />
-            <p className="text-gray-600">{language === 'ar' ? 'جاري التحميل...' : language === 'fr' ? 'Chargement...' : 'Loading...'}</p>
+            <p className="text-gray-600">{language === 'ar' ? 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...' : language === 'fr' ? 'Chargement...' : 'Loading...'}</p>
           </div>
         ) : filteredDocs.length === 0 ? (
           <div className="p-12 text-center">
             <FileText className="w-16 h-16 mx-auto mb-3 text-gray-300" />
             <p className="text-gray-600 font-medium mb-2">
-              {language === 'ar' ? 'لا توجد مستندات' : language === 'fr' ? 'Aucun document' : 'No documents found'}
+              {language === 'ar' ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø³ØªÙ†Ø¯Ø§Øª' : language === 'fr' ? 'Aucun document' : 'No documents found'}
             </p>
             <p className="text-sm text-gray-400">
-              {language === 'ar' ? 'جرب تغيير الفلاتر' : language === 'fr' ? 'Essayez de modifier les filtres' : 'Try adjusting your filters'}
+              {language === 'ar' ? 'Ø¬Ø±Ø¨ ØªØºÙŠÙŠØ± Ø§Ù„ÙÙ„Ø§ØªØ±' : language === 'fr' ? 'Essayez de modifier les filtres' : 'Try adjusting your filters'}
             </p>
           </div>
         ) : (
@@ -284,19 +284,19 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
               <thead className="bg-gray-50 border-b-2 border-gray-100">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {language === 'ar' ? 'المستند' : language === 'fr' ? 'Document' : 'Document'}
+                    {language === 'ar' ? 'Ø§Ù„Ù…Ø³ØªÙ†Ø¯' : language === 'fr' ? 'Document' : 'Document'}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {language === 'ar' ? 'النوع' : language === 'fr' ? 'Type' : 'Type'}
+                    {language === 'ar' ? 'Ø§Ù„Ù†ÙˆØ¹' : language === 'fr' ? 'Type' : 'Type'}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {language === 'ar' ? 'الحالة' : language === 'fr' ? 'Statut' : 'Status'}
+                    {language === 'ar' ? 'Ø§Ù„Ø­Ø§Ù„Ø©' : language === 'fr' ? 'Statut' : 'Status'}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {language === 'ar' ? 'التاريخ' : language === 'fr' ? 'Date' : 'Date'}
+                    {language === 'ar' ? 'Ø§Ù„ØªØ§Ø±ÙŠØ®' : language === 'fr' ? 'Date' : 'Date'}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {language === 'ar' ? 'الإجراءات' : language === 'fr' ? 'Actions' : 'Actions'}
+                    {language === 'ar' ? 'Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª' : language === 'fr' ? 'Actions' : 'Actions'}
                   </th>
                 </tr>
               </thead>
@@ -341,14 +341,14 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
                       <div className="flex items-center gap-2">
                         <button 
                           className="p-2 hover:bg-blue-50 rounded-lg transition-colors group"
-                          title={language === 'ar' ? 'عرض' : language === 'fr' ? 'Voir' : 'View'}
+                          title={language === 'ar' ? 'Ø¹Ø±Ø¶' : language === 'fr' ? 'Voir' : 'View'}
                         >
                           <Eye className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
                         </button>
                         <button 
                           onClick={() => setDeleteDoc(doc)}
                           className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
-                          title={language === 'ar' ? 'حذف' : language === 'fr' ? 'Supprimer' : 'Delete'}
+                          title={language === 'ar' ? 'Ø­Ø°Ù' : language === 'fr' ? 'Supprimer' : 'Delete'}
                         >
                           <Trash2 className="w-4 h-4 text-gray-400 group-hover:text-red-600" />
                         </button>
@@ -367,11 +367,11 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setDeleteDoc(null)}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6" onClick={e => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-gray-900 mb-3">
-              {language === 'ar' ? 'تأكيد الحذف' : language === 'fr' ? 'Confirmer la suppression' : 'Confirm Delete'}
+              {language === 'ar' ? 'ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø­Ø°Ù' : language === 'fr' ? 'Confirmer la suppression' : 'Confirm Delete'}
             </h3>
             <p className="text-gray-600 mb-6">
-              {language === 'ar' ? `هل أنت متأكد من حذف "${deleteDoc.fileName || deleteDoc.name}"؟` :
-               language === 'fr' ? `Êtes-vous sûr de vouloir supprimer "${deleteDoc.fileName || deleteDoc.name}"?` :
+              {language === 'ar' ? `Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù "${deleteDoc.fileName || deleteDoc.name}"ØŸ` :
+               language === 'fr' ? `ÃŠtes-vous sÃ»r de vouloir supprimer "${deleteDoc.fileName || deleteDoc.name}"?` :
                `Are you sure you want to delete "${deleteDoc.fileName || deleteDoc.name}"?`}
             </p>
             <div className="flex gap-3">
@@ -379,13 +379,13 @@ function Dashboard({ documents, tenant, setDocuments, showToast, schemes, loadin
                 onClick={() => setDeleteDoc(null)}
                 className="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all font-medium"
               >
-                {language === 'ar' ? 'إلغاء' : language === 'fr' ? 'Annuler' : 'Cancel'}
+                {language === 'ar' ? 'Ø¥Ù„ØºØ§Ø¡' : language === 'fr' ? 'Annuler' : 'Cancel'}
               </button>
               <button 
                 onClick={() => handleDelete(deleteDoc)}
                 className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-medium"
               >
-                {language === 'ar' ? 'حذف' : language === 'fr' ? 'Supprimer' : 'Delete'}
+                {language === 'ar' ? 'Ø­Ø°Ù' : language === 'fr' ? 'Supprimer' : 'Delete'}
               </button>
             </div>
           </div>

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import WorkflowExecutionTracker from './components/WorkflowExecutionTracker';
 import AdvancedAnalyticsDashboard from './components/AdvancedAnalyticsDashboard';
-// âœ… IMPORT CONTEXTS (NOT DUPLICATE THEM)
-import { useOrg } from './contexts/OrgContext';
 
-// âœ… IMPORT PAGES
+// ✅ IMPORT CONTEXTS (PROPERLY USE THEM)
+import { useOrg } from './contexts/OrgContext';
+import { useLanguage } from './contexts/LanguageContext';
+import { useTheme } from './contexts/ThemeContext';
+
+// ✅ IMPORT PAGES
 import Dashboard from './pages/Dashboard';
 import ScannerUI from './pages/ScannerUI';
 import WorkflowDesigner from './pages/WorkflowDesigner';
@@ -13,31 +16,32 @@ import DocumentViewer from './pages/DocumentViewer';
 import AIConfiguration from './pages/AIConfiguration';
 import Repositories from './pages/Repositories';
 
-// âœ… IMPORT COMPONENTS
+// ✅ IMPORT COMPONENTS
 import Sidebar from './components/layout/Sidebar';
 import Toast from './components/common/Toast';
 import OrgHierarchySystem from './components/common/OrgHierarchySystem';
 import WorkflowTemplateLibrary from './components/common/WorkflowTemplateLibrary';
 
-
-// âœ… IMPORT SERVICES
+// ✅ IMPORT SERVICES
 import { apiService } from './services/api';
 
 /**
- * ðŸ¢ DOCUWAVE SYSTEM - MAIN APPLICATION
+ * 🏢 DOCUWAVE SYSTEM - MAIN APPLICATION
  * ======================================
  * Central application component that:
  * - Manages application state (documents, schemes, current tab)
  * - Handles tenant selection
  * - Routes between different modules
  * - Provides toast notifications
- * - Uses OrgContext (not duplicates it)
+ * - Uses ALL contexts properly (Org, Language, Theme)
  * 
  * @component
  */
 function DocuWaveSystem() {
-  // âœ… USE ORG CONTEXT (imported from OrgContext.jsx)
+  // ✅ USE ALL CONTEXTS PROPERLY
   const { orgStructure, routingEngine } = useOrg();
+  const { language, setLanguage, isRTL } = useLanguage();
+  const { theme, toggleTheme, isDark } = useTheme();
 
   // Application state
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -55,13 +59,6 @@ function DocuWaveSystem() {
     { id: 'tenant_002', name: 'Global Industries', aiMode: 'local' },
     { id: 'tenant_003', name: 'Tech Solutions', aiMode: 'cloud' }
   ];
-
-  const [language, setLanguage] = useState('en');
-  const [theme, setTheme] = useState('light');
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
 
   // Mock documents data (will come from backend later)
   const mockDocuments = [
@@ -127,7 +124,7 @@ function DocuWaveSystem() {
         throw new Error('API not available');
       }
     } catch (error) {
-      console.warn('ðŸ“¡ API not available, using mock data:', error.message);
+      console.warn('📡 API not available, using mock data:', error.message);
       
       // Use mock data
       setSchemes(mockSchemes);
@@ -144,11 +141,17 @@ function DocuWaveSystem() {
     loadData();
   }, []);
 
+  // Log context values for debugging
+  useEffect(() => {
+    console.log('🌍 Current Language:', language, '| RTL:', isRTL);
+    console.log('🎨 Current Theme:', theme, '| Dark:', isDark);
+  }, [language, theme, isRTL, isDark]);
+
   // Get current tenant
   const currentTenant = tenants.find(t => t.id === selectedTenant);
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className={`flex h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Sidebar Navigation */}
       <Sidebar 
         activeTab={activeTab}
@@ -234,6 +237,7 @@ function DocuWaveSystem() {
             showToast={showToast}
           />
         )}
+
         {activeTab === 'workflow-tracker' && (
           <WorkflowExecutionTracker showToast={showToast} />
         )}

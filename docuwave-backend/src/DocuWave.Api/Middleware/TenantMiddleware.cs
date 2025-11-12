@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Http;
+using System.Linq;
+using System.Security.Claims;
 using DocuWave.Infrastructure.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace DocuWave.Api.Middleware;
 
@@ -14,15 +16,17 @@ public class TenantMiddleware
 
     public async Task Invoke(HttpContext context)
     {
-        if (context.Request.Path.StartsWithSegments("/swagger") || context.Request.Path.StartsWithSegments("/health"))
+        if (HttpMethods.IsOptions(context.Request.Method)
+            || context.Request.Path.StartsWithSegments("/swagger")
+            || context.Request.Path.StartsWithSegments("/health")
+            || context.Request.Path.StartsWithSegments("/metrics"))
         {
             await _next(context);
             return;
         }
 
         var header = context.Request.Headers["X-Tenant-Id"].FirstOrDefault();
-        var claim = context.User?.Claims?.FirstOrDefault(c => c.Type == "tenantId")?.Value;
-        var tenantId = header ?? claim;
+        var tenantId = header ?? ResolveTenantFromClaims(context.User);
 
         if (string.IsNullOrWhiteSpace(tenantId))
         {
@@ -34,5 +38,17 @@ public class TenantMiddleware
         context.Items["TenantId"] = tenantId;
         TenantContext.SetTenant(tenantId);
         await _next(context);
+    }
+
+    private static string? ResolveTenantFromClaims(ClaimsPrincipal? principal)
+    {
+        if (principal == null)
+        {
+            return null;
+        }
+
+        return principal.FindFirst("tenantId")?.Value
+            ?? principal.FindFirst("tid")?.Value
+            ?? principal.FindFirst("http://schemas.microsoft.com/identity/claims/tenantid")?.Value;
     }
 }

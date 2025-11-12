@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +57,15 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>("database");
 
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics =>
+    {
+        metrics.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("DocuWave.Api"));
+        metrics.AddAspNetCoreInstrumentation();
+        metrics.AddHttpClientInstrumentation();
+        metrics.AddPrometheusExporter();
+    });
+
 builder.Services.AddDocuWavePlatform(builder.Configuration);
 
 var app = builder.Build();
@@ -98,6 +109,7 @@ app.MapHub<NotificationHub>("/hubs/notifications");
 app.MapHub<RepositoriesHub>("/hubs/repositories");
 app.MapHub<AnalyticsHub>("/hubs/analytics");
 app.MapHealthChecks("/health");
+app.MapPrometheusScrapingEndpoint();
 
 using (var scope = app.Services.CreateScope())
 {

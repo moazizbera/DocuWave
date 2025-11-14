@@ -201,6 +201,6 @@ export class APIService {
   }
 }
 
-const apiService = new APIService();
+export const apiService = new APIService();
 
 export default apiService;

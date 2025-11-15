@@ -47,6 +47,14 @@ export class APIService {
     }
   }
 
+  auth = {
+    login: (credentials = {}) =>
+      this.request('/auth/login', {
+        method: 'POST',
+        body: credentials
+      })
+  };
+
   documents = {
     list: () => this.request('/document'),
     upload: (file, { schemeId, language = 'en', ocrEngine = 'Tesseract' } = {}) => {

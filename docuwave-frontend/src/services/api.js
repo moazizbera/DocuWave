@@ -33,7 +33,14 @@ export class APIService {
   constructor({ baseURL = DEFAULT_API_BASE_URL, tokenProvider = defaultTokenProvider, fetchImpl } = {}) {
     this.baseURL = this.#normalizeBaseURL(baseURL);
     this.tokenProvider = tokenProvider;
-    this.fetch = fetchImpl || (typeof fetch !== 'undefined' ? fetch.bind(globalThis) : null);
+    const fetchContext =
+      typeof window !== 'undefined'
+        ? window
+        : typeof global !== 'undefined'
+        ? global
+        : undefined;
+
+    this.fetch = fetchImpl || (typeof fetch !== 'undefined' ? fetch.bind(fetchContext) : null);
 
     if (!this.fetch) {
       throw new Error('A fetch implementation must be provided to APIService.');

@@ -93,4 +93,22 @@ describe('APIService', () => {
     );
     expect(documents).toEqual([{ id: '123' }]);
   });
+
+  it('provides authentication helpers for login', async () => {
+    const payload = { token: 'abc123', user: { id: 'user-1' } };
+    fetchMock.mockResolvedValue(
+      createFetchResponse({ body: JSON.stringify(payload) })
+    );
+
+    const response = await service.auth.login({ email: 'user@example.com', password: 'secret' });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://api.example.com/auth/login',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ email: 'user@example.com', password: 'secret' })
+      })
+    );
+    expect(response).toEqual(payload);
+  });
 });

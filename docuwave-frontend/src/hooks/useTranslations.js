@@ -4,19 +4,14 @@ import translations from '../locales';
 /**
  * 🌍 USE TRANSLATIONS HOOK
  * =========================
- * Custom hook for accessing translations based on current language
- * 
- * @returns {Function} t - Translation function
- * 
- * @example
- * const t = useTranslations();
- * <h1>{t('dashboard.title')}</h1>
- * // English: "Dashboard"
- * // Arabic: "لوحة التحكم"
- * // French: "Tableau de bord"
+ * Custom hook for accessing translations based on current language.
+ * Returns both the raw translation dictionary (for ergonomic optional chaining)
+ * and a helper to resolve dot-notation keys with interpolation support.
  */
 export function useTranslations() {
   const { language } = useLanguage();
+
+  const dictionary = translations[language] || translations.en;
 
   /**
    * Get translation by key path
@@ -24,32 +19,29 @@ export function useTranslations() {
    * @param {Object} params - Optional parameters for interpolation
    * @returns {string} Translated text or key if not found
    */
-  const t = (key, params = {}) => {
-    // Split key by dots to navigate nested object
+  const translate = (key, params = {}) => {
     const keys = key.split('.');
-    let value = translations[language];
+    let value = dictionary;
 
-    // Navigate through nested object
-    for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = value[k];
+    for (const currentKey of keys) {
+      if (value && typeof value === 'object' && currentKey in value) {
+        value = value[currentKey];
       } else {
         console.warn(`Translation missing for key: ${key} in language: ${language}`);
-        return key; // Return key if translation not found
+        return key;
       }
     }
 
-    // Handle parameter interpolation
     if (typeof value === 'string' && Object.keys(params).length > 0) {
-      return value.replace(/\{(\w+)\}/g, (match, param) => {
-        return params[param] !== undefined ? params[param] : match;
-      });
+      return value.replace(/\{(\w+)\}/g, (match, param) => (
+        params[param] !== undefined ? params[param] : match
+      ));
     }
 
     return value;
   };
 
-  return t;
+  return { t: dictionary, translate };
 }
 
 export default useTranslations;

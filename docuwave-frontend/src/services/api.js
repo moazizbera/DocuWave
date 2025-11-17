@@ -1,6 +1,6 @@
 const DEFAULT_API_BASE_URL =
   (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) ||
-  'https://localhost:7095/api';
+  'http://localhost:7095/api';
 
 const defaultTokenProvider = () => {
   if (typeof window !== 'undefined' && window.localStorage) {
@@ -46,6 +46,14 @@ export class APIService {
       throw new Error('A fetch implementation must be provided to APIService.');
     }
   }
+
+  auth = {
+    login: (credentials = {}) =>
+      this.request('/auth/login', {
+        method: 'POST',
+        body: credentials
+      })
+  };
 
   documents = {
     list: () => this.request('/document'),

@@ -164,41 +164,20 @@ function ScannerUI({ setDocuments, showToast, schemes, onRefresh }) {
     let successCount = 0;
     let failCount = 0;
 
-    for (const doc of scannedDocs) {
-      if (doc.file) {
-        try {
-          setUploadProgress(prev => ({ ...prev, [doc.id]: 0 }));
-          
-          // Simulate upload progress
-          const progressInterval = setInterval(() => {
-            setUploadProgress(prev => {
-              const current = prev[doc.id] || 0;
-              if (current >= 90) {
-                clearInterval(progressInterval);
-                return prev;
-              }
-              return { ...prev, [doc.id]: current + 10 };
-            });
-          }, 200);
-
-          await apiService.uploadDocument(doc.file, selectedScheme);
-          
-          clearInterval(progressInterval);
-          setUploadProgress(prev => ({ ...prev, [doc.id]: 100 }));
-          
-          setScannedDocs(prev => prev.map(d => 
-            d.id === doc.id ? { ...d, status: 'success' } : d
-          ));
-          
-          successCount++;
-        } catch (error) {
-          console.error('Upload failed:', error);
-          setScannedDocs(prev => prev.map(d => 
-            d.id === doc.id ? { ...d, status: 'failed' } : d
-          ));
-          failCount++;
-        }
-      }
+    try {
+      await apiService.uploadDocuments(
+        scannedDocs.map((doc) => doc.file),
+        { schemeId: selectedScheme }
+      );
+      successCount = scannedDocs.length;
+      setUploadProgress(
+        scannedDocs.reduce((acc, doc) => ({ ...acc, [doc.id]: 100 }), {})
+      );
+      setScannedDocs((prev) => prev.map((d) => ({ ...d, status: 'success' })));
+    } catch (error) {
+      console.error('Upload failed:', error);
+      failCount = scannedDocs.length;
+      setScannedDocs((prev) => prev.map((d) => ({ ...d, status: 'failed' })));
     }
 
     setUploading(false);

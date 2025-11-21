@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   Bell, CheckCircle, XCircle, AlertCircle, Info, Clock,
   Trash2, Check, X, Filter, Settings
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { apiService } from '../../services/api';
 
 /**
  * 🔔 NOTIFICATION CENTER
@@ -16,47 +17,31 @@ import { useLanguage } from '../../contexts/LanguageContext';
  * - Clear all
  */
 
-// Mock notifications (replace with real data from backend/websocket)
-const mockNotifications = [
-  {
-    id: 1,
-    type: 'success',
-    title: { ar: 'تمت الموافقة', en: 'Approved', fr: 'Approuvé' },
-    message: { ar: 'تمت الموافقة على طلب الإجازة الخاص بك', en: 'Your leave request has been approved', fr: 'Votre demande de congé a été approuvée' },
-    timestamp: new Date(Date.now() - 5 * 60000),
-    read: false
-  },
-  {
-    id: 2,
-    type: 'warning',
-    title: { ar: 'يتطلب انتباهك', en: 'Requires Attention', fr: 'Nécessite attention' },
-    message: { ar: 'لديك 3 مستندات في انتظار المراجعة', en: 'You have 3 documents pending review', fr: 'Vous avez 3 documents en attente' },
-    timestamp: new Date(Date.now() - 30 * 60000),
-    read: false
-  },
-  {
-    id: 3,
-    type: 'info',
-    title: { ar: 'تحديث جديد', en: 'New Update', fr: 'Nouvelle mise à jour' },
-    message: { ar: 'تم تحديث النظام إلى الإصدار 2.0', en: 'System updated to version 2.0', fr: 'Système mis à jour vers la version 2.0' },
-    timestamp: new Date(Date.now() - 2 * 60 * 60000),
-    read: true
-  },
-  {
-    id: 4,
-    type: 'error',
-    title: { ar: 'فشل التحميل', en: 'Upload Failed', fr: 'Échec du téléchargement' },
-    message: { ar: 'فشل تحميل المستند "Invoice_001.pdf"', en: 'Failed to upload document "Invoice_001.pdf"', fr: 'Échec du téléchargement "Invoice_001.pdf"' },
-    timestamp: new Date(Date.now() - 4 * 60 * 60000),
-    read: true
-  }
-];
-
 function NotificationCenter({ showToast }) {
   const { language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState('all'); // 'all', 'unread'
+
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const response = await apiService.getNotifications();
+        if (Array.isArray(response)) {
+          setNotifications(
+            response.map((n) => ({
+              ...n,
+              timestamp: n.timestamp ? new Date(n.timestamp) : new Date()
+            }))
+          );
+        }
+      } catch (error) {
+        console.error('Failed to load notifications', error);
+      }
+    };
+
+    loadNotifications();
+  }, []);
 
   // Calculate unread count
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -108,10 +93,9 @@ function NotificationCenter({ showToast }) {
   };
 
   // Mark as read
-  const markAsRead = (id) => {
-    setNotifications(prev => prev.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    ));
+  const markAsRead = async (id) => {
+    await apiService.markNotificationRead(id);
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
   };
 
   // Mark all as read

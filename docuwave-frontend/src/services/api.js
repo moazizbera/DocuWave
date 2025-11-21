@@ -1,6 +1,6 @@
 const DEFAULT_API_BASE_URL =
   (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) ||
-  'http://localhost:7095/api';
+  'https://localhost:7095/api';
 
 const defaultTokenProvider = () => {
   if (typeof window !== 'undefined' && window.localStorage) {
@@ -11,6 +11,27 @@ const defaultTokenProvider = () => {
     }
   }
   return null;
+};
+
+const defaultTenantProvider = () => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      return window.localStorage.getItem('docuwave_tenant');
+    } catch (error) {
+      console.warn('Unable to read tenant from localStorage', error);
+    }
+  }
+  return null;
+};
+
+const emitToast = (message, type = 'error') => {
+  if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+    window.dispatchEvent(
+      new CustomEvent('api-toast', {
+        detail: { message, type }
+      })
+    );
+  }
 };
 
 const isFormData = (value) =>
@@ -30,9 +51,15 @@ export class APIError extends Error {
 }
 
 export class APIService {
-  constructor({ baseURL = DEFAULT_API_BASE_URL, tokenProvider = defaultTokenProvider, fetchImpl } = {}) {
+  constructor({
+    baseURL = DEFAULT_API_BASE_URL,
+    tokenProvider = defaultTokenProvider,
+    tenantProvider = defaultTenantProvider,
+    fetchImpl
+  } = {}) {
     this.baseURL = this.#normalizeBaseURL(baseURL);
     this.tokenProvider = tokenProvider;
+    this.tenantProvider = tenantProvider;
     const fetchContext =
       typeof window !== 'undefined'
         ? window
@@ -108,6 +135,345 @@ export class APIService {
     workflows: () => this.request('/analytics/workflows')
   };
 
+  /**
+   * Get tenants list.
+   * @returns {Promise<any>} Tenants payload.
+   */
+  async getTenants() {
+    return this.request('/tenants');
+  }
+
+  /**
+   * Create tenant.
+   * @param {object} payload Tenant payload.
+   * @returns {Promise<any>} Created tenant.
+   */
+  async createTenant(payload) {
+    return this.request('/tenants', { method: 'POST', body: payload });
+  }
+
+  /**
+   * Get schemes list.
+   * @returns {Promise<any>} Schemes payload.
+   */
+  async getSchemes() {
+    return this.request('/schemes');
+  }
+
+  /**
+   * Create scheme.
+   * @param {object} payload Scheme payload.
+   * @returns {Promise<any>} Created scheme.
+   */
+  async createScheme(payload) {
+    return this.request('/schemes', { method: 'POST', body: payload });
+  }
+
+  /**
+   * Get documents list.
+   * @returns {Promise<any>} Documents payload.
+   */
+  async getDocuments() {
+    return this.request('/document');
+  }
+
+  /**
+   * Upload documents.
+   * @param {File|File[]} files Files to upload.
+   * @param {object} options Upload options.
+   * @returns {Promise<any>} Upload response.
+   */
+  async uploadDocuments(files, options = {}) {
+    const { schemeId, language = 'en', ocrEngine = 'Tesseract' } = options;
+    const payload = Array.isArray(files) ? files : [files];
+    if (typeof FormData === 'undefined') {
+      throw new Error('File uploads require FormData support.');
+    }
+    const formData = new FormData();
+    payload.forEach((file) => formData.append('files', file));
+    const query = new URLSearchParams({
+      schemeId: String(schemeId || ''),
+      language,
+      ocrEngine
+    }).toString();
+    return this.request(`/document/upload?${query}`, { method: 'POST', body: formData });
+  }
+
+  /**
+   * Delete document by id.
+   * @param {string|number} documentId Document identifier.
+   * @returns {Promise<any>} Delete response.
+   */
+  async deleteDocument(documentId) {
+    return this.request(`/document/${documentId}`, { method: 'DELETE' });
+  }
+
+  /**
+   * Get document content.
+   * @param {string|number} documentId Document identifier.
+   * @returns {Promise<any>} Document content.
+   */
+  async getDocumentContent(documentId) {
+    return this.request(`/document/${documentId}/content`);
+  }
+
+  /**
+   * Get annotations for a document.
+   * @param {string|number} documentId Document identifier.
+   * @returns {Promise<any>} Annotation collection.
+   */
+  async getAnnotations(documentId) {
+    return this.request(`/document/${documentId}/annotations`);
+  }
+
+  /**
+   * Create annotation for a document.
+   * @param {string|number} documentId Document identifier.
+   * @param {object} payload Annotation payload.
+   * @returns {Promise<any>} Created annotation.
+   */
+  async createAnnotation(documentId, payload) {
+    return this.request(`/document/${documentId}/annotations`, { method: 'POST', body: payload });
+  }
+
+  /**
+   * Update annotation.
+   * @param {string|number} documentId Document identifier.
+   * @param {string|number} annotationId Annotation identifier.
+   * @param {object} payload Annotation payload.
+   * @returns {Promise<any>} Updated annotation.
+   */
+  async updateAnnotation(documentId, annotationId, payload) {
+    return this.request(`/document/${documentId}/annotations/${annotationId}`, {
+      method: 'PUT',
+      body: payload
+    });
+  }
+
+  /**
+   * Delete annotation.
+   * @param {string|number} documentId Document identifier.
+   * @param {string|number} annotationId Annotation identifier.
+   * @returns {Promise<any>} Delete response.
+   */
+  async deleteAnnotation(documentId, annotationId) {
+    return this.request(`/document/${documentId}/annotations/${annotationId}`, { method: 'DELETE' });
+  }
+
+  /**
+   * Get AI settings.
+   * @returns {Promise<any>} AI settings payload.
+   */
+  async getAISettings() {
+    return this.request('/ai/settings');
+  }
+
+  /**
+   * Update AI settings.
+   * @param {object} payload Settings payload.
+   * @returns {Promise<any>} Updated settings.
+   */
+  async updateAISettings(payload) {
+    return this.request('/ai/settings', { method: 'PUT', body: payload });
+  }
+
+  /**
+   * Test AI settings.
+   * @param {object} payload Settings payload.
+   * @returns {Promise<any>} Test result.
+   */
+  async testAISettings(payload) {
+    return this.request('/ai/settings/test', { method: 'POST', body: payload });
+  }
+
+  /**
+   * Get repositories.
+   * @returns {Promise<any>} Repository list.
+   */
+  async getRepositories() {
+    return this.request('/repositories');
+  }
+
+  /**
+   * Create repository.
+   * @param {object} payload Repository payload.
+   * @returns {Promise<any>} Created repository.
+   */
+  async createRepository(payload) {
+    return this.request('/repositories', { method: 'POST', body: payload });
+  }
+
+  /**
+   * Test repository connection.
+   * @param {object} payload Repository payload.
+   * @returns {Promise<any>} Test response.
+   */
+  async testRepository(payload) {
+    return this.request('/repositories/test', { method: 'POST', body: payload });
+  }
+
+  /**
+   * Get analytics documents data.
+   * @returns {Promise<any>} Document analytics.
+   */
+  async getAnalyticsDocuments() {
+    return this.request('/analytics/documents');
+  }
+
+  /**
+   * Get analytics workflows data.
+   * @returns {Promise<any>} Workflow analytics.
+   */
+  async getAnalyticsWorkflows() {
+    return this.request('/analytics/workflows');
+  }
+
+  /**
+   * Get analytics users data.
+   * @returns {Promise<any>} User analytics.
+   */
+  async getAnalyticsUsers() {
+    return this.request('/analytics/users');
+  }
+
+  /**
+   * Export analytics dataset.
+   * @returns {Promise<any>} Export payload.
+   */
+  async exportAnalytics() {
+    return this.request('/analytics/export');
+  }
+
+  /**
+   * Get workflows.
+   * @returns {Promise<any>} Workflow list.
+   */
+  async getWorkflows() {
+    return this.request('/workflow');
+  }
+
+  /**
+   * Create workflow.
+   * @param {object} payload Workflow payload.
+   * @returns {Promise<any>} Created workflow.
+   */
+  async createWorkflow(payload) {
+    return this.request('/workflow', { method: 'POST', body: payload });
+  }
+
+  /**
+   * Publish workflow.
+   * @param {string|number} workflowId Workflow identifier.
+   * @returns {Promise<any>} Publish response.
+   */
+  async publishWorkflow(workflowId) {
+    return this.request(`/workflow/${workflowId}/publish`, { method: 'POST' });
+  }
+
+  /**
+   * Get workflow instances.
+   * @returns {Promise<any>} Workflow instance list.
+   */
+  async getWorkflowInstances() {
+    return this.request('/workflow/instances');
+  }
+
+  /**
+   * Start workflow instance.
+   * @param {object} payload Instance payload.
+   * @returns {Promise<any>} Start response.
+   */
+  async startWorkflowInstance(payload) {
+    return this.request('/workflow/instances', { method: 'POST', body: payload });
+  }
+
+  /**
+   * Pause workflow instance.
+   * @param {string|number} instanceId Instance identifier.
+   * @returns {Promise<any>} Pause response.
+   */
+  async pauseWorkflowInstance(instanceId) {
+    return this.request(`/workflow/instances/${instanceId}/pause`, { method: 'POST' });
+  }
+
+  /**
+   * Resume workflow instance.
+   * @param {string|number} instanceId Instance identifier.
+   * @returns {Promise<any>} Resume response.
+   */
+  async resumeWorkflowInstance(instanceId) {
+    return this.request(`/workflow/instances/${instanceId}/resume`, { method: 'POST' });
+  }
+
+  /**
+   * Cancel workflow instance.
+   * @param {string|number} instanceId Instance identifier.
+   * @returns {Promise<any>} Cancel response.
+   */
+  async cancelWorkflowInstance(instanceId) {
+    return this.request(`/workflow/instances/${instanceId}/cancel`, { method: 'POST' });
+  }
+
+  /**
+   * Get forms.
+   * @returns {Promise<any>} Form list.
+   */
+  async getForms() {
+    return this.request('/forms');
+  }
+
+  /**
+   * Create form.
+   * @param {object} payload Form payload.
+   * @returns {Promise<any>} Created form.
+   */
+  async createForm(payload) {
+    return this.request('/forms', { method: 'POST', body: payload });
+  }
+
+  /**
+   * Publish form.
+   * @param {string|number} formId Form identifier.
+   * @returns {Promise<any>} Publish response.
+   */
+  async publishForm(formId) {
+    return this.request(`/forms/${formId}/publish`, { method: 'POST' });
+  }
+
+  /**
+   * Get organization structure.
+   * @returns {Promise<any>} Organization structure.
+   */
+  async getOrgStructure() {
+    return this.request('/organization/structure');
+  }
+
+  /**
+   * Import organization structure.
+   * @param {object} payload Structure payload.
+   * @returns {Promise<any>} Import response.
+   */
+  async importOrgStructure(payload) {
+    return this.request('/organization/structure/import', { method: 'POST', body: payload });
+  }
+
+  /**
+   * Get notifications.
+   * @returns {Promise<any>} Notifications list.
+   */
+  async getNotifications() {
+    return this.request('/notifications');
+  }
+
+  /**
+   * Mark notification as read.
+   * @param {string|number} notificationId Notification identifier.
+   * @returns {Promise<any>} Mark response.
+   */
+  async markNotificationRead(notificationId) {
+    return this.request(`/notifications/${notificationId}/read`, { method: 'POST' });
+  }
+
   async request(path, options = {}) {
     if (!path) {
       throw new Error('A request path must be provided.');
@@ -128,6 +494,7 @@ export class APIService {
 
     if (!response.ok) {
       const message = (parsedBody && parsedBody.message) || response.statusText || 'Request failed';
+      emitToast(message, 'error');
       throw new APIError(message, {
         status: response.status,
         statusText: response.statusText,
@@ -152,6 +519,11 @@ export class APIService {
     const token = this.tokenProvider ? this.tokenProvider() : null;
     if (token && !headers.Authorization && !headers.authorization) {
       headers.Authorization = `Bearer ${token}`;
+    }
+
+    const tenantId = this.tenantProvider ? this.tenantProvider() : null;
+    if (tenantId && !headers['X-Tenant-Id']) {
+      headers['X-Tenant-Id'] = tenantId;
     }
 
     return headers;

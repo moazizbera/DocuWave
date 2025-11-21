@@ -1,221 +1,305 @@
-const DEFAULT_API_BASE_URL =
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) ||
-  'http://localhost:7095/api';
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
-const defaultTokenProvider = () => {
-  if (typeof window !== 'undefined' && window.localStorage) {
-    try {
-      return window.localStorage.getItem('docuwave_token');
-    } catch (error) {
-      console.warn('Unable to read auth token from localStorage', error);
-    }
-  }
-  return null;
+export const API_BASE_URL = (process.env.REACT_APP_API_URL || 'https://localhost:7095').replace(/\/$/, '');
+
+let authContext = {
+  tenantId: null,
+  token: null
 };
 
-const isFormData = (value) =>
-  typeof FormData !== 'undefined' && value instanceof FormData;
-
-const isPlainObject = (value) =>
-  Object.prototype.toString.call(value) === '[object Object]';
-
-export class APIError extends Error {
-  constructor(message, { status, statusText, body } = {}) {
-    super(message);
-    this.name = 'APIError';
-    this.status = status;
-    this.statusText = statusText;
-    this.body = body;
-  }
-}
-
-export class APIService {
-  constructor({ baseURL = DEFAULT_API_BASE_URL, tokenProvider = defaultTokenProvider, fetchImpl } = {}) {
-    this.baseURL = this.#normalizeBaseURL(baseURL);
-    this.tokenProvider = tokenProvider;
-    const fetchContext =
-      typeof window !== 'undefined'
-        ? window
-        : typeof global !== 'undefined'
-        ? global
-        : undefined;
-
-    this.fetch = fetchImpl || (typeof fetch !== 'undefined' ? fetch.bind(fetchContext) : null);
-
-    if (!this.fetch) {
-      throw new Error('A fetch implementation must be provided to APIService.');
+/**
+ * Update the current tenant and token used for all API calls.
+ * @param {{tenantId?: string|null, token?: string|null}} context
+ */
+export const setAuthContext = ({ tenantId, token }) => {
+  authContext = {
+    tenantId: tenantId || null,
+    token: token || null
+  };
+  if (typeof window !== 'undefined' && window.localStorage) {
+    if (tenantId) {
+      window.localStorage.setItem('docuwave_tenant', tenantId);
+    }
+    if (token) {
+      window.localStorage.setItem('docuwave_token', token);
     }
   }
+};
 
-  auth = {
-    login: (credentials = {}) =>
-      this.request('/auth/login', {
-        method: 'POST',
-        body: credentials
-      })
-  };
-
-  documents = {
-    list: () => this.request('/document'),
-    upload: (file, { schemeId, language = 'en', ocrEngine = 'Tesseract' } = {}) => {
-      if (typeof FormData === 'undefined') {
-        throw new Error('File uploads require FormData support.');
-      }
-
-      if (!schemeId) {
-        throw new Error('schemeId is required to upload a document.');
-      }
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const query = new URLSearchParams({
-        schemeId: String(schemeId),
-        language,
-        ocrEngine
-      }).toString();
-
-      return this.request(`/document/upload?${query}`, {
-        method: 'POST',
-        body: formData
-      });
-    },
-    remove: (id) => this.request(`/document/${id}`, { method: 'DELETE' })
-  };
-
-  workflows = {
-    list: () => this.request('/workflow'),
-    get: (id) => this.request(`/workflow/${id}`),
-    trigger: (id, payload = {}) =>
-      this.request(`/workflow/${id}/trigger`, {
-        method: 'POST',
-        body: payload
-      })
-  };
-
-  organization = {
-    getProfile: () => this.request('/organization'),
-    updateProfile: (payload) =>
-      this.request('/organization', {
-        method: 'PUT',
-        body: payload
-      })
-  };
-
-  analytics = {
-    overview: () => this.request('/analytics/overview'),
-    documents: () => this.request('/analytics/documents'),
-    workflows: () => this.request('/analytics/workflows')
-  };
-
-  async request(path, options = {}) {
-    if (!path) {
-      throw new Error('A request path must be provided.');
-    }
-
-    const { headers: customHeaders = {}, body, ...rest } = options;
-    const headers = this.#buildHeaders(customHeaders, body);
-    const url = this.#buildURL(path);
-    const requestBody = this.#prepareBody(body, headers);
-
-    const response = await this.fetch(url, {
-      ...rest,
-      headers,
-      body: requestBody
-    });
-
-    const parsedBody = await this.#parseResponseBody(response);
-
-    if (!response.ok) {
-      const message = (parsedBody && parsedBody.message) || response.statusText || 'Request failed';
-      throw new APIError(message, {
-        status: response.status,
-        statusText: response.statusText,
-        body: parsedBody
-      });
-    }
-
-    return parsedBody;
+const buildHeaders = (custom = {}, isForm = false) => {
+  const headers = { ...custom };
+  if (!isForm) {
+    headers['Content-Type'] = headers['Content-Type'] || 'application/json';
   }
-
-  #buildHeaders(initialHeaders = {}, body) {
-    const headers = { ...initialHeaders };
-
-    if (!headers.Accept && !headers.accept) {
-      headers.Accept = 'application/json';
-    }
-
-    if (body && !headers['Content-Type'] && !headers['content-type'] && !isFormData(body)) {
-      headers['Content-Type'] = 'application/json';
-    }
-
-    const token = this.tokenProvider ? this.tokenProvider() : null;
-    if (token && !headers.Authorization && !headers.authorization) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    return headers;
+  if (authContext.tenantId) {
+    headers['X-Tenant-Id'] = authContext.tenantId;
   }
-
-  #prepareBody(body, headers) {
-    if (!body) {
-      return undefined;
-    }
-
-    if (
-      isFormData(body) ||
-      typeof body === 'string' ||
-      (typeof Blob !== 'undefined' && body instanceof Blob)
-    ) {
-      return body;
-    }
-
-    if (isPlainObject(body)) {
-      const contentType = headers['Content-Type'] || headers['content-type'];
-      if (contentType && String(contentType).includes('application/json')) {
-        return JSON.stringify(body);
-      }
-      return body;
-    }
-
-    return body;
+  if (authContext.token) {
+    headers.Authorization = `Bearer ${authContext.token}`;
   }
+  return headers;
+};
 
-  async #parseResponseBody(response) {
-    if (!response || typeof response.text !== 'function') {
-      return null;
+const toQueryString = (params = {}) => {
+  const search = new URLSearchParams();
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      search.append(key, value);
     }
+  });
+  const qs = search.toString();
+  return qs ? `?${qs}` : '';
+};
 
-    const raw = await response.text();
-
-    if (!raw) {
-      return null;
-    }
-
+const handleResponse = async (response, parseAsBlob = false) => {
+  if (!response.ok) {
+    let message = response.statusText;
     try {
-      return JSON.parse(raw);
-    } catch (error) {
-      return raw;
+      const data = await response.json();
+      message = data?.message || data?.error || JSON.stringify(data) || message;
+    } catch {
+      // ignore json parse errors
     }
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      window.dispatchEvent(
+        new CustomEvent('api-toast', {
+          detail: { message, type: 'error' }
+        })
+      );
+    }
+    throw new Error(message);
   }
 
-  #buildURL(path) {
-    if (/^https?:\/\//i.test(path)) {
-      return path;
-    }
-
-    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-    return `${this.baseURL}${normalizedPath}`;
+  if (parseAsBlob) {
+    return response.blob();
   }
-
-  #normalizeBaseURL(url) {
-    if (!url) {
-      return '';
-    }
-    return url.replace(/\/?$/, '');
+  const text = await response.text();
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
   }
-}
+};
 
-export const apiService = new APIService();
+const request = async (path, { method = 'GET', headers = {}, body, params, parseAsBlob } = {}) => {
+  const isForm = body instanceof FormData;
+  const url = `${API_BASE_URL}${path}${toQueryString(params)}`;
+  const response = await fetch(url, {
+    method,
+    headers: buildHeaders(headers, isForm),
+    body: body && !isForm && typeof body === 'object' ? JSON.stringify(body) : body
+  });
+  return handleResponse(response, parseAsBlob);
+};
+
+const createHubConnection = (path, options = {}) => {
+  const connection = new HubConnectionBuilder()
+    .withUrl(`${API_BASE_URL}${path}`, {
+      ...options,
+      accessTokenFactory: () => authContext.token || '',
+      headers: {
+        ...(options.headers || {}),
+        ...(authContext.tenantId ? { 'X-Tenant-Id': authContext.tenantId } : {})
+      }
+    })
+    .withAutomaticReconnect()
+    .configureLogging(LogLevel.Information)
+    .build();
+  return connection;
+};
+
+const apiService = {
+  /** Get tenants */
+  async getTenants(params) {
+    return request('/api/tenants', { params });
+  },
+  /** Create tenant */
+  async createTenant(payload) {
+    return request('/api/tenants', { method: 'POST', body: payload });
+  },
+  /** Get schemes */
+  async getSchemes(params) {
+    return request('/api/schemes', { params });
+  },
+  /** Create scheme */
+  async createScheme(payload) {
+    return request('/api/schemes', { method: 'POST', body: payload });
+  },
+  /** Get documents */
+  async getDocuments(params) {
+    return request('/api/documents', { params });
+  },
+  /** Upload documents */
+  async uploadDocuments({ files = [], schemeId, extra = {} }) {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    if (schemeId) {
+      formData.append('schemeId', schemeId);
+    }
+    Object.entries(extra || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value);
+      }
+    });
+    return request('/api/documents/upload', { method: 'POST', body: formData });
+  },
+  /** Delete document */
+  async deleteDocument(id) {
+    return request(`/api/documents/${id}`, { method: 'DELETE' });
+  },
+  /** Bulk document action */
+  async bulkDocumentAction(payload) {
+    return request('/api/documents/bulk', { method: 'POST', body: payload });
+  },
+  /** Get document */
+  async getDocument(id) {
+    return request(`/api/documents/${id}`);
+  },
+  /** Get document content */
+  async getDocumentContent(id, rendition) {
+    return request(`/api/documents/${id}/content`, {
+      params: rendition ? { rendition } : undefined,
+      parseAsBlob: true
+    });
+  },
+  /** Get annotations */
+  async getAnnotations(documentId) {
+    return request(`/api/documents/${documentId}/annotations`);
+  },
+  /** Create annotation */
+  async createAnnotation(documentId, payload) {
+    return request(`/api/documents/${documentId}/annotations`, { method: 'POST', body: payload });
+  },
+  /** Update annotation */
+  async updateAnnotation(documentId, annotationId, payload) {
+    return request(`/api/documents/${documentId}/annotations/${annotationId}`, {
+      method: 'PUT',
+      body: payload
+    });
+  },
+  /** Delete annotation */
+  async deleteAnnotation(documentId, annotationId) {
+    return request(`/api/documents/${documentId}/annotations/${annotationId}`, { method: 'DELETE' });
+  },
+  /** Get AI settings */
+  async getAISettings() {
+    return request('/api/ai/settings');
+  },
+  /** Update AI settings */
+  async updateAISettings(payload) {
+    return request('/api/ai/settings', { method: 'PUT', body: payload });
+  },
+  /** Test AI settings */
+  async testAISettings() {
+    return request('/api/ai/settings/test', { method: 'POST' });
+  },
+  /** Get repositories */
+  async getRepositories(params) {
+    return request('/api/repositories', { params });
+  },
+  /** Create repository */
+  async createRepository(payload) {
+    return request('/api/repositories', { method: 'POST', body: payload });
+  },
+  /** Test repository */
+  async testRepository(id) {
+    return request(`/api/repositories/${id}/test`, { method: 'POST' });
+  },
+  /** Get repository jobs */
+  async getRepositoryJobs(params) {
+    return request('/api/repositories/jobs', { params });
+  },
+  /** Get analytics documents */
+  async getAnalyticsDocuments(params) {
+    return request('/api/analytics/documents', { params });
+  },
+  /** Get analytics workflows */
+  async getAnalyticsWorkflows(params) {
+    return request('/api/analytics/workflows', { params });
+  },
+  /** Get analytics users */
+  async getAnalyticsUsers(params) {
+    return request('/api/analytics/users', { params });
+  },
+  /** Export analytics */
+  async exportAnalytics(payload) {
+    return request('/api/analytics/export', { method: 'POST', body: payload });
+  },
+  /** Get workflow templates */
+  async getWorkflowTemplates(params) {
+    return request('/api/workflow/templates', { params });
+  },
+  /** Import workflow template */
+  async importWorkflowTemplate(payload) {
+    return request('/api/workflow/templates/import', { method: 'POST', body: payload });
+  },
+  /** Get workflow definitions */
+  async getWorkflowDefinitions(params) {
+    return request('/api/workflow/definitions', { params });
+  },
+  /** Create workflow definition */
+  async createWorkflowDefinition(payload) {
+    return request('/api/workflow/definitions', { method: 'POST', body: payload });
+  },
+  /** Publish workflow definition */
+  async publishWorkflowDefinition(id) {
+    return request(`/api/workflow/definitions/${id}/publish`, { method: 'POST' });
+  },
+  /** Get workflow instances */
+  async getWorkflowInstances(params) {
+    return request('/api/workflow/instances', { params });
+  },
+  /** Start workflow instance */
+  async startWorkflowInstance(payload) {
+    return request('/api/workflow/instances', { method: 'POST', body: payload });
+  },
+  /** Pause workflow instance */
+  async pauseWorkflowInstance(id) {
+    return request(`/api/workflow/instances/${id}:pause`, { method: 'POST' });
+  },
+  /** Resume workflow instance */
+  async resumeWorkflowInstance(id) {
+    return request(`/api/workflow/instances/${id}:resume`, { method: 'POST' });
+  },
+  /** Reassign workflow instance */
+  async reassignWorkflowInstance(id, payload) {
+    return request(`/api/workflow/instances/${id}:reassign`, { method: 'POST', body: payload });
+  },
+  /** Cancel workflow instance */
+  async cancelWorkflowInstance(id) {
+    return request(`/api/workflow/instances/${id}:cancel`, { method: 'POST' });
+  },
+  /** Get forms */
+  async getForms(params) {
+    return request('/api/forms', { params });
+  },
+  /** Create form */
+  async createForm(payload) {
+    return request('/api/forms', { method: 'POST', body: payload });
+  },
+  /** Publish form */
+  async publishForm(id) {
+    return request(`/api/forms/${id}/publish`, { method: 'POST' });
+  },
+  /** Get org structure */
+  async getOrgStructure() {
+    return request('/api/org/structure');
+  },
+  /** Import org structure */
+  async importOrgStructure(formData) {
+    return request('/api/org/structure/import', { method: 'POST', body: formData });
+  },
+  /** Get notifications */
+  async getNotifications(params) {
+    return request('/api/notifications', { params });
+  },
+  /** Mark notification read */
+  async markNotificationRead(id) {
+    return request(`/api/notifications/${id}/read`, { method: 'POST' });
+  },
+  /** Create SignalR hub connection */
+  createHubConnection
+};
 
 export default apiService;

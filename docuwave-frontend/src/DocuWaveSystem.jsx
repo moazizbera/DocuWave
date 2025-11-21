@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import WorkflowExecutionTracker from './components/WorkflowExecutionTracker';
 import AdvancedAnalyticsDashboard from './components/AdvancedAnalyticsDashboard';
-
-// ✅ IMPORT CONTEXTS (PROPERLY USE THEM)
 import { useOrg } from './contexts/OrgContext';
 import { useLanguage } from './contexts/LanguageContext';
 import { useTheme } from './contexts/ThemeContext';
-
-// ✅ IMPORT PAGES
 import Dashboard from './pages/Dashboard';
 import ScannerUI from './pages/ScannerUI';
 import WorkflowDesigner from './pages/WorkflowDesigner';
@@ -15,95 +11,80 @@ import FormioBuilder from './pages/FormioBuilder';
 import DocumentViewer from './pages/DocumentViewer';
 import AIConfiguration from './pages/AIConfiguration';
 import Repositories from './pages/Repositories';
-
-// ✅ IMPORT COMPONENTS
 import Sidebar from './components/layout/Sidebar';
 import Toast from './components/common/Toast';
 import OrgHierarchySystem from './components/common/OrgHierarchySystem';
 import WorkflowTemplateLibrary from './components/common/WorkflowTemplateLibrary';
+import NotificationCenter from './components/common/NotificationCenter';
+import OrganizationManager from './pages/OrganizationManager';
+import apiService, { setAuthContext } from './services/api';
 
-// ✅ IMPORT SERVICES
-import { apiService } from './services/api';
-
-/**
- * 🏢 DOCUWAVE SYSTEM - MAIN APPLICATION
- * ======================================
- * Central application component that:
- * - Manages application state (documents, schemes, current tab)
- * - Handles tenant selection
- * - Routes between different modules
- * - Provides toast notifications
- * - Uses ALL contexts properly (Org, Language, Theme)
- * 
- * @component
- */
 function DocuWaveSystem() {
-  // ✅ USE ALL CONTEXTS PROPERLY
-  const { orgStructure, routingEngine } = useOrg();
+  const { orgStructure } = useOrg();
   const { language, setLanguage, isRTL } = useLanguage();
   const { theme, toggleTheme, isDark } = useTheme();
 
-  // Application state
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedTenant, setSelectedTenant] = useState('');
+  const [selectedTenant, setSelectedTenant] = useState(null);
   const [toast, setToast] = useState(null);
-
-  // Data state
   const [documents, setDocuments] = useState([]);
   const [schemes, setSchemes] = useState([]);
   const [tenants, setTenants] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  // Toast notification helper
-  const showToast = (message, type) => {
-    setToast({ message, type });
-  };
-
-  // Load data from API (or mock data)
-  const loadData = async () => {
-    if (!selectedTenant) {
-      return;
+  const token = useMemo(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem('docuwave_token');
     }
+    return null;
+  }, []);
 
+  const showToast = useCallback((message, type) => {
+    setToast({ message, type });
+  }, []);
+
+  const loadTenantData = useCallback(async () => {
+    if (!selectedTenant) return;
     setLoading(true);
-
     try {
-      window.localStorage.setItem('docuwave_tenant', selectedTenant);
-      const schemesData = await apiService.getSchemes();
+      const [schemesData, docsData] = await Promise.all([
+        apiService.getSchemes(),
+        apiService.getDocuments()
+      ]);
       setSchemes(Array.isArray(schemesData) ? schemesData : []);
-      const docsData = await apiService.getDocuments();
       setDocuments(Array.isArray(docsData) ? docsData : []);
     } catch (error) {
-      console.warn('Unable to load data', error);
       showToast('Unable to load data from API', 'error');
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedTenant, showToast]);
 
-  // Load data on mount
   useEffect(() => {
     const fetchTenants = async () => {
       try {
-        const tenantResponse = await apiService.getTenants();
-        if (Array.isArray(tenantResponse)) {
-          setTenants(tenantResponse);
-          const initialTenant =
-            window.localStorage.getItem('docuwave_tenant') || tenantResponse[0]?.id || '';
-          setSelectedTenant(initialTenant);
+        const data = await apiService.getTenants();
+        if (Array.isArray(data) && data.length > 0) {
+          setTenants(data);
+          const stored = typeof window !== 'undefined'
+            ? window.localStorage.getItem('docuwave_tenant')
+            : null;
+          const initial = data.find((t) => t.id === stored) || data[0];
+          setSelectedTenant(initial);
         }
       } catch (error) {
-        console.error('Failed to load tenants', error);
         showToast('Failed to load tenants', 'error');
       }
     };
-
     fetchTenants();
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
-    loadData();
-  }, [selectedTenant]);
+    if (selectedTenant) {
+      setAuthContext({ tenantId: selectedTenant.id, token });
+      loadTenantData();
+    }
+  }, [selectedTenant, token, loadTenantData]);
 
   useEffect(() => {
     const toastHandler = (event) => {
@@ -111,28 +92,28 @@ function DocuWaveSystem() {
         setToast(event.detail);
       }
     };
-
     window.addEventListener('api-toast', toastHandler);
     return () => window.removeEventListener('api-toast', toastHandler);
   }, []);
 
-  // Log context values for debugging
   useEffect(() => {
     console.log('🌍 Current Language:', language, '| RTL:', isRTL);
     console.log('🎨 Current Theme:', theme, '| Dark:', isDark);
-  }, [language, theme, isRTL, isDark]);
+    console.log('🏢 Org Structure loaded:', !!orgStructure);
+  }, [language, isRTL, theme, isDark, orgStructure]);
 
-  // Get current tenant
-  const currentTenant = tenants.find((t) => t.id === selectedTenant);
+  const currentTenant = selectedTenant;
 
   return (
     <div className={`flex h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      {/* Sidebar Navigation */}
-      <Sidebar 
+      <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        selectedTenant={selectedTenant}
-        onTenantChange={setSelectedTenant}
+        selectedTenant={currentTenant?.id || ''}
+        onTenantChange={(tenantId) => {
+          const tenant = tenants.find((t) => t.id === tenantId);
+          setSelectedTenant(tenant || null);
+        }}
         tenants={tenants}
         language={language}
         setLanguage={setLanguage}
@@ -141,95 +122,67 @@ function DocuWaveSystem() {
         showToast={showToast}
       />
 
-      {/* Main Content Area */}
       <div className="flex-1 overflow-auto">
+        <div className="flex justify-end p-4">
+          <NotificationCenter showToast={showToast} />
+        </div>
+
         {activeTab === 'dashboard' && (
-          <Dashboard 
+          <Dashboard
             documents={documents}
             tenant={currentTenant}
             setDocuments={setDocuments}
             showToast={showToast}
             schemes={schemes}
             loading={loading}
-            onRefresh={loadData}
+            onRefresh={loadTenantData}
           />
         )}
 
         {activeTab === 'scanner' && (
-          <ScannerUI 
+          <ScannerUI
             setDocuments={setDocuments}
             showToast={showToast}
             schemes={schemes}
-            onRefresh={loadData}
+            onUploadComplete={loadTenantData}
+            selectedTenant={currentTenant}
           />
         )}
 
         {activeTab === 'workflow-templates' && (
-          <WorkflowTemplateLibrary 
+          <WorkflowTemplateLibrary
             showToast={showToast}
             onSelectTemplate={(template) => {
-              // When template selected, switch to workflow designer
               setActiveTab('workflow');
               showToast(`Template loaded: ${template.nameEn}`, 'success');
             }}
           />
         )}
 
-        {activeTab === 'workflow' && (
-          <WorkflowDesigner 
-            showToast={showToast}
-            // Org structure is available via useOrg() hook inside WorkflowDesigner
-          />
-        )}
+        {activeTab === 'workflow' && <WorkflowDesigner showToast={showToast} />}
 
-        {activeTab === 'formio' && (
-          <FormioBuilder 
-            showToast={showToast}
-          />
-        )}
+        {activeTab === 'formio' && <FormioBuilder showToast={showToast} />}
 
-        {activeTab === 'viewer' && (
-          <DocumentViewer 
-            showToast={showToast}
-          />
-        )}
+        {activeTab === 'viewer' && <DocumentViewer showToast={showToast} />}
 
         {activeTab === 'ai-config' && (
-          <AIConfiguration 
-            tenant={currentTenant}
-            showToast={showToast}
-          />
+          <AIConfiguration tenant={currentTenant} showToast={showToast} />
         )}
 
-        {activeTab === 'repositories' && (
-          <Repositories 
-            showToast={showToast}
-          />
-        )}
+        {activeTab === 'repositories' && <Repositories showToast={showToast} />}
 
-        {activeTab === 'org-hierarchy' && (
-          <OrgHierarchySystem 
-            showToast={showToast}
-          />
-        )}
+        {activeTab === 'org-hierarchy' && <OrgHierarchySystem showToast={showToast} />}
 
-        {activeTab === 'workflow-tracker' && (
-          <WorkflowExecutionTracker showToast={showToast} />
-        )}
+        {activeTab === 'workflow-tracker' && <WorkflowExecutionTracker showToast={showToast} />}
 
-        {activeTab === 'analytics' && (
-          <AdvancedAnalyticsDashboard showToast={showToast} />
+        {activeTab === 'analytics' && <AdvancedAnalyticsDashboard showToast={showToast} />}
+
+        {activeTab === 'organization-manager' && (
+          <OrganizationManager showToast={showToast} onRefresh={loadTenantData} />
         )}
       </div>
 
-      {/* Toast Notifications */}
-      {toast && (
-        <Toast 
-          message={toast.message} 
-          type={toast.type} 
-          onClose={() => setToast(null)} 
-        />
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }

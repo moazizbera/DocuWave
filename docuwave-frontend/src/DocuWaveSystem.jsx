@@ -45,61 +45,14 @@ function DocuWaveSystem() {
 
   // Application state
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedTenant, setSelectedTenant] = useState('tenant_001');
+  const [selectedTenant, setSelectedTenant] = useState('');
   const [toast, setToast] = useState(null);
-  
+
   // Data state
   const [documents, setDocuments] = useState([]);
   const [schemes, setSchemes] = useState([]);
+  const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Mock tenants data (will come from backend later)
-  const tenants = [
-    { id: 'tenant_001', name: 'Acme Corp', aiMode: 'cloud' },
-    { id: 'tenant_002', name: 'Global Industries', aiMode: 'local' },
-    { id: 'tenant_003', name: 'Tech Solutions', aiMode: 'cloud' }
-  ];
-
-  // Mock documents data (will come from backend later)
-  const mockDocuments = [
-    { 
-      id: 1, 
-      name: 'Invoice_12345.pdf', 
-      fileName: 'Invoice_12345.pdf', 
-      type: 'invoice', 
-      scheme: 'Invoice', 
-      status: 'processed', 
-      date: '2025-10-04', 
-      uploadedAt: '2025-10-04T10:00:00' 
-    },
-    { 
-      id: 2, 
-      name: 'Contract_ABC.docx', 
-      fileName: 'Contract_ABC.docx', 
-      type: 'contract', 
-      scheme: 'Contract', 
-      status: 'pending', 
-      date: '2025-10-03', 
-      uploadedAt: '2025-10-03T10:00:00' 
-    },
-    { 
-      id: 3, 
-      name: 'Receipt_789.jpg', 
-      fileName: 'Receipt_789.jpg', 
-      type: 'receipt', 
-      scheme: 'Receipt', 
-      status: 'processing', 
-      date: '2025-10-04', 
-      uploadedAt: '2025-10-04T10:00:00' 
-    }
-  ];
-
-  // Mock schemes data (will come from backend later)
-  const mockSchemes = [
-    { id: '1', name: 'Invoice' },
-    { id: '2', name: 'Contract' },
-    { id: '3', name: 'Receipt' }
-  ];
 
   // Toast notification helper
   const showToast = (message, type) => {
@@ -108,29 +61,21 @@ function DocuWaveSystem() {
 
   // Load data from API (or mock data)
   const loadData = async () => {
+    if (!selectedTenant) {
+      return;
+    }
+
     setLoading(true);
-    
+
     try {
-      // Try to get schemes from API
+      window.localStorage.setItem('docuwave_tenant', selectedTenant);
       const schemesData = await apiService.getSchemes();
-      
-      if (schemesData) {
-        setSchemes(schemesData);
-        
-        // Try to get documents from API
-        const docsData = await apiService.getDocuments();
-        setDocuments(docsData || mockDocuments);
-      } else {
-        throw new Error('API not available');
-      }
+      setSchemes(Array.isArray(schemesData) ? schemesData : []);
+      const docsData = await apiService.getDocuments();
+      setDocuments(Array.isArray(docsData) ? docsData : []);
     } catch (error) {
-      console.warn('📡 API not available, using mock data:', error.message);
-      
-      // Use mock data
-      setSchemes(mockSchemes);
-      setDocuments(mockDocuments);
-      
-      showToast('Using demo mode', 'warning');
+      console.warn('Unable to load data', error);
+      showToast('Unable to load data from API', 'error');
     } finally {
       setLoading(false);
     }
@@ -138,7 +83,37 @@ function DocuWaveSystem() {
 
   // Load data on mount
   useEffect(() => {
+    const fetchTenants = async () => {
+      try {
+        const tenantResponse = await apiService.getTenants();
+        if (Array.isArray(tenantResponse)) {
+          setTenants(tenantResponse);
+          const initialTenant =
+            window.localStorage.getItem('docuwave_tenant') || tenantResponse[0]?.id || '';
+          setSelectedTenant(initialTenant);
+        }
+      } catch (error) {
+        console.error('Failed to load tenants', error);
+        showToast('Failed to load tenants', 'error');
+      }
+    };
+
+    fetchTenants();
+  }, []);
+
+  useEffect(() => {
     loadData();
+  }, [selectedTenant]);
+
+  useEffect(() => {
+    const toastHandler = (event) => {
+      if (event?.detail) {
+        setToast(event.detail);
+      }
+    };
+
+    window.addEventListener('api-toast', toastHandler);
+    return () => window.removeEventListener('api-toast', toastHandler);
   }, []);
 
   // Log context values for debugging
@@ -148,7 +123,7 @@ function DocuWaveSystem() {
   }, [language, theme, isRTL, isDark]);
 
   // Get current tenant
-  const currentTenant = tenants.find(t => t.id === selectedTenant);
+  const currentTenant = tenants.find((t) => t.id === selectedTenant);
 
   return (
     <div className={`flex h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>

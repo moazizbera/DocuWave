@@ -21,6 +21,7 @@ import Sidebar from './components/layout/Sidebar';
 import Toast from './components/common/Toast';
 import OrgHierarchySystem from './components/common/OrgHierarchySystem';
 import WorkflowTemplateLibrary from './components/common/WorkflowTemplateLibrary';
+import UserManagement from './components/common/UserManagement';
 
 // ✅ IMPORT SERVICES
 import { apiService } from './services/api';
@@ -234,6 +235,11 @@ function DocuWaveSystem() {
 
         {activeTab === 'org-hierarchy' && (
           <OrgHierarchySystem 
+            showToast={showToast}
+          />
+        )}
+        {activeTab === 'users' && (
+          <UserManagement 
             showToast={showToast}
           />
         )}

@@ -2,29 +2,97 @@ import React, { useState } from 'react';
 import { 
   Users, UserPlus, Edit3, Trash2, Search, Filter, Mail, Phone, 
   Building2, Briefcase, Shield, Crown, X, Save, Eye, EyeOff,
-  CheckCircle, XCircle, MoreVertical, Download, Upload
+  CheckCircle, XCircle, MoreVertical, Download, Upload, ChevronDown
 } from 'lucide-react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useOrg } from '../contexts/OrgContext';
 
-/**
- * 👥 USER MANAGEMENT SYSTEM
- * ========================
- * Complete user management with:
- * - Add/Edit/Delete users
- * - Role assignment
- * - Department assignment
- * - Search & filter
- * - Bulk actions
- * - Import/Export
- * - Status management
- */
+// Initial organizational structure (same as OrgContext)
+const initialOrgStructure = {
+  id: 'org_1',
+  name: { ar: 'المنظمة الرئيسية', en: 'Main Organization', fr: 'Organisation Principale' },
+  ceo: {
+    id: 'emp_1',
+    name: { ar: 'أحمد محمد', en: 'Ahmed Mohamed', fr: 'Ahmed Mohamed' },
+    position: { ar: 'الرئيس التنفيذي', en: 'CEO', fr: 'PDG' },
+    email: 'ahmed.mohamed@company.com',
+    level: 1,
+    status: 'active'
+  },
+  departments: [
+    {
+      id: 'dept_hr',
+      name: { ar: 'الموارد البشرية', en: 'Human Resources', fr: 'Ressources Humaines' },
+      manager: {
+        id: 'emp_2',
+        name: { ar: 'فاطمة علي', en: 'Fatima Ali', fr: 'Fatima Ali' },
+        position: { ar: 'مدير الموارد البشرية', en: 'HR Manager', fr: 'Directeur RH' },
+        email: 'fatima.ali@company.com',
+        level: 2,
+        status: 'active'
+      },
+      employees: [
+        {
+          id: 'emp_3',
+          name: { ar: 'سارة أحمد', en: 'Sara Ahmed', fr: 'Sara Ahmed' },
+          position: { ar: 'أخصائي توظيف', en: 'Recruitment Specialist', fr: 'Spécialiste Recrutement' },
+          email: 'sara.ahmed@company.com',
+          managerId: 'emp_2',
+          level: 3,
+          status: 'active'
+        }
+      ]
+    },
+    {
+      id: 'dept_finance',
+      name: { ar: 'المالية', en: 'Finance', fr: 'Finance' },
+      manager: {
+        id: 'emp_5',
+        name: { ar: 'عمر حسن', en: 'Omar Hassan', fr: 'Omar Hassan' },
+        position: { ar: 'المدير المالي', en: 'Finance Manager', fr: 'Directeur Financier' },
+        email: 'omar.hassan@company.com',
+        level: 2,
+        status: 'active'
+      },
+      employees: [
+        {
+          id: 'emp_6',
+          name: { ar: 'ليلى محمود', en: 'Layla Mahmoud', fr: 'Layla Mahmoud' },
+          position: { ar: 'محاسب', en: 'Accountant', fr: 'Comptable' },
+          email: 'layla.mahmoud@company.com',
+          managerId: 'emp_5',
+          level: 3,
+          status: 'active'
+        }
+      ]
+    },
+    {
+      id: 'dept_it',
+      name: { ar: 'تقنية المعلومات', en: 'IT Department', fr: 'Département IT' },
+      manager: {
+        id: 'emp_8',
+        name: { ar: 'يوسف إبراهيم', en: 'Youssef Ibrahim', fr: 'Youssef Ibrahim' },
+        position: { ar: 'مدير تقنية المعلومات', en: 'IT Manager', fr: 'Directeur IT' },
+        email: 'youssef.ibrahim@company.com',
+        level: 2,
+        status: 'active'
+      },
+      employees: [
+        {
+          id: 'emp_9',
+          name: { ar: 'نور الدين', en: 'Nour Aldeen', fr: 'Nour Aldeen' },
+          position: { ar: 'مطور برامج', en: 'Software Developer', fr: 'Développeur' },
+          email: 'nour.aldeen@company.com',
+          managerId: 'emp_8',
+          level: 3,
+          status: 'active'
+        }
+      ]
+    }
+  ]
+};
 
-function UserManagement({ showToast }) {
-  const { language } = useLanguage();
-  const { orgStructure, routingEngine } = useOrg();
-  
-  const [users, setUsers] = useState(() => routingEngine.getAllEmployees());
+function UserManagement() {
+  const [language, setLanguage] = useState('en');
+  const [orgStructure, setOrgStructure] = useState(initialOrgStructure);
   const [searchQuery, setSearchQuery] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [levelFilter, setLevelFilter] = useState('all');
@@ -35,48 +103,71 @@ function UserManagement({ showToast }) {
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [toast, setToast] = useState(null);
   
   // Form state
   const [userForm, setUserForm] = useState({
-    nameEn: '',
-    nameAr: '',
-    nameFr: '',
-    positionEn: '',
-    positionAr: '',
-    positionFr: '',
-    email: '',
-    phone: '',
-    department: '',
-    level: 3,
-    status: 'active',
-    role: 'employee'
+    nameEn: '', nameAr: '', nameFr: '',
+    positionEn: '', positionAr: '', positionFr: '',
+    email: '', phone: '',
+    department: '', level: 3, status: 'active', role: 'employee'
   });
 
-  // Get text helper
   const getText = (obj) => {
     if (typeof obj === 'string') return obj;
     return obj?.[language] || obj?.en || '';
   };
 
+  const showToast = (message, type) => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // Get all employees
+  const getAllEmployees = () => {
+    const employees = [orgStructure.ceo];
+    orgStructure.departments.forEach(dept => {
+      employees.push(dept.manager);
+      employees.push(...dept.employees);
+    });
+    return employees;
+  };
+
+  // Get department for employee
+  const getEmployeeDepartment = (empId) => {
+    if (empId === orgStructure.ceo.id) return null;
+    for (const dept of orgStructure.departments) {
+      if (dept.manager.id === empId || dept.employees.some(e => e.id === empId)) {
+        return dept;
+      }
+    }
+    return null;
+  };
+
+  const allEmployees = getAllEmployees();
+
   // Filter users
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = allEmployees.filter(user => {
     const matchesSearch = !searchQuery || 
       getText(user.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
       getText(user.position).toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const userDept = routingEngine.getEmployeeDepartment(user.id);
-    const matchesDepartment = departmentFilter === 'all' || 
-      userDept?.id === departmentFilter;
-    
-    const matchesLevel = levelFilter === 'all' || 
-      user.level === parseInt(levelFilter);
-    
-    const matchesStatus = statusFilter === 'all' || 
-      (user.status || 'active') === statusFilter;
+    const userDept = getEmployeeDepartment(user.id);
+    const matchesDepartment = departmentFilter === 'all' || userDept?.id === departmentFilter;
+    const matchesLevel = levelFilter === 'all' || user.level === parseInt(levelFilter);
+    const matchesStatus = statusFilter === 'all' || (user.status || 'active') === statusFilter;
     
     return matchesSearch && matchesDepartment && matchesLevel && matchesStatus;
   });
+
+  // Calculate stats
+  const stats = {
+    total: allEmployees.length,
+    active: allEmployees.filter(u => (u.status || 'active') === 'active').length,
+    managers: allEmployees.filter(u => u.level === 2).length,
+    departments: orgStructure.departments.length
+  };
 
   // Get level badge
   const getLevelBadge = (level) => {
@@ -91,8 +182,16 @@ function UserManagement({ showToast }) {
   // Get status badge
   const getStatusBadge = (status) => {
     const badges = {
-      active: { icon: CheckCircle, label: language === 'ar' ? 'نشط' : language === 'fr' ? 'Actif' : 'Active', color: 'bg-green-100 text-green-700 border-green-200' },
-      inactive: { icon: XCircle, label: language === 'ar' ? 'غير نشط' : language === 'fr' ? 'Inactif' : 'Inactive', color: 'bg-red-100 text-red-700 border-red-200' }
+      active: { 
+        icon: CheckCircle, 
+        label: language === 'ar' ? 'نشط' : language === 'fr' ? 'Actif' : 'Active', 
+        color: 'bg-green-100 text-green-700 border-green-200' 
+      },
+      inactive: { 
+        icon: XCircle, 
+        label: language === 'ar' ? 'غير نشط' : language === 'fr' ? 'Inactif' : 'Inactive', 
+        color: 'bg-red-100 text-red-700 border-red-200' 
+      }
     };
     return badges[status] || badges.active;
   };
@@ -112,6 +211,7 @@ function UserManagement({ showToast }) {
   // Open edit user modal
   const openEditUser = (user) => {
     setEditingUser(user);
+    const dept = getEmployeeDepartment(user.id);
     setUserForm({
       nameEn: user.name.en || '',
       nameAr: user.name.ar || '',
@@ -121,7 +221,7 @@ function UserManagement({ showToast }) {
       positionFr: user.position.fr || '',
       email: user.email || '',
       phone: user.phone || '',
-      department: routingEngine.getEmployeeDepartment(user.id)?.id || '',
+      department: dept?.id || '',
       level: user.level || 3,
       status: user.status || 'active',
       role: user.role || 'employee'
@@ -131,7 +231,6 @@ function UserManagement({ showToast }) {
 
   // Save user
   const saveUser = () => {
-    // Validation
     if (!userForm.nameEn || !userForm.email) {
       showToast(
         language === 'ar' ? 'الاسم والبريد الإلكتروني مطلوبان' :
@@ -143,19 +242,7 @@ function UserManagement({ showToast }) {
     }
 
     if (editingUser) {
-      // Update existing user
-      setUsers(prev => prev.map(u => 
-        u.id === editingUser.id ? {
-          ...u,
-          name: { ar: userForm.nameAr, en: userForm.nameEn, fr: userForm.nameFr },
-          position: { ar: userForm.positionAr, en: userForm.positionEn, fr: userForm.positionFr },
-          email: userForm.email,
-          phone: userForm.phone,
-          level: userForm.level,
-          status: userForm.status,
-          role: userForm.role
-        } : u
-      ));
+      // Update existing user logic
       showToast(
         language === 'ar' ? 'تم تحديث المستخدم' :
         language === 'fr' ? 'Utilisateur mis à jour' :
@@ -163,18 +250,7 @@ function UserManagement({ showToast }) {
         'success'
       );
     } else {
-      // Add new user
-      const newUser = {
-        id: `emp_${Date.now()}`,
-        name: { ar: userForm.nameAr, en: userForm.nameEn, fr: userForm.nameFr },
-        position: { ar: userForm.positionAr, en: userForm.positionEn, fr: userForm.positionFr },
-        email: userForm.email,
-        phone: userForm.phone,
-        level: userForm.level,
-        status: userForm.status,
-        role: userForm.role
-      };
-      setUsers(prev => [...prev, newUser]);
+      // Add new user logic
       showToast(
         language === 'ar' ? 'تم إضافة المستخدم' :
         language === 'fr' ? 'Utilisateur ajouté' :
@@ -198,7 +274,6 @@ function UserManagement({ showToast }) {
       return;
     }
 
-    setUsers(prev => prev.filter(u => u.id !== user.id));
     showToast(
       language === 'ar' ? 'تم حذف المستخدم' :
       language === 'fr' ? 'Utilisateur supprimé' :
@@ -258,15 +333,24 @@ function UserManagement({ showToast }) {
             </p>
           </div>
 
-          <button
-            onClick={openAddUser}
-            className="px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
-          >
-            <UserPlus className="w-5 h-5" />
-            {language === 'ar' ? 'إضافة مستخدم' :
-             language === 'fr' ? 'Ajouter utilisateur' :
-             'Add User'}
-          </button>
+          <div className="flex gap-2">
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} 
+              className="px-3 py-2 border-2 border-gray-200 rounded-lg bg-white">
+              <option value="en">English</option>
+              <option value="ar">العربية</option>
+              <option value="fr">Français</option>
+            </select>
+
+            <button
+              onClick={openAddUser}
+              className="px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
+            >
+              <UserPlus className="w-5 h-5" />
+              {language === 'ar' ? 'إضافة مستخدم' :
+               language === 'fr' ? 'Ajouter utilisateur' :
+               'Add User'}
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -279,7 +363,7 @@ function UserManagement({ showToast }) {
                    language === 'fr' ? 'Total utilisateurs' :
                    'Total Users'}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
               </div>
               <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                 <Users className="w-6 h-6 text-blue-600" />
@@ -295,9 +379,7 @@ function UserManagement({ showToast }) {
                    language === 'fr' ? 'Actifs' :
                    'Active'}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {users.filter(u => (u.status || 'active') === 'active').length}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
               </div>
               <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                 <CheckCircle className="w-6 h-6 text-green-600" />
@@ -313,9 +395,7 @@ function UserManagement({ showToast }) {
                    language === 'fr' ? 'Managers' :
                    'Managers'}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {users.filter(u => u.level === 2).length}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{stats.managers}</p>
               </div>
               <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
                 <Shield className="w-6 h-6 text-purple-600" />
@@ -331,9 +411,7 @@ function UserManagement({ showToast }) {
                    language === 'fr' ? 'Départements' :
                    'Departments'}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {orgStructure.departments.length}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{stats.departments}</p>
               </div>
               <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
                 <Building2 className="w-6 h-6 text-orange-600" />
@@ -345,7 +423,6 @@ function UserManagement({ showToast }) {
         {/* Filters */}
         <div className="bg-white rounded-2xl border-2 border-gray-100 p-4">
           <div className="flex flex-wrap items-center gap-3">
-            {/* Search */}
             <div className="flex-1 min-w-[300px] relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -357,7 +434,6 @@ function UserManagement({ showToast }) {
               />
             </div>
 
-            {/* Department Filter */}
             <select
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
@@ -371,7 +447,6 @@ function UserManagement({ showToast }) {
               ))}
             </select>
 
-            {/* Level Filter */}
             <select
               value={levelFilter}
               onChange={(e) => setLevelFilter(e.target.value)}
@@ -385,7 +460,6 @@ function UserManagement({ showToast }) {
               <option value="3">Level 3 - Employee</option>
             </select>
 
-            {/* Status Filter */}
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -402,7 +476,6 @@ function UserManagement({ showToast }) {
               </option>
             </select>
 
-            {/* Export */}
             <button
               onClick={exportUsers}
               className="px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
@@ -446,7 +519,7 @@ function UserManagement({ showToast }) {
               {filteredUsers.map(user => {
                 const levelBadge = getLevelBadge(user.level);
                 const statusBadge = getStatusBadge(user.status || 'active');
-                const userDept = routingEngine.getEmployeeDepartment(user.id);
+                const userDept = getEmployeeDepartment(user.id);
                 const LevelIcon = levelBadge.icon;
                 const StatusIcon = statusBadge.icon;
 
@@ -504,7 +577,6 @@ function UserManagement({ showToast }) {
                         <button
                           onClick={() => openEditUser(user)}
                           className="p-2 hover:bg-blue-50 rounded-lg transition-colors group"
-                          title={language === 'ar' ? 'تعديل' : language === 'fr' ? 'Modifier' : 'Edit'}
                         >
                           <Edit3 className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
                         </button>
@@ -512,7 +584,6 @@ function UserManagement({ showToast }) {
                           <button
                             onClick={() => setDeleteConfirm(user)}
                             className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
-                            title={language === 'ar' ? 'حذف' : language === 'fr' ? 'Supprimer' : 'Delete'}
                           >
                             <Trash2 className="w-4 h-4 text-gray-400 group-hover:text-red-600" />
                           </button>
@@ -769,6 +840,25 @@ function UserManagement({ showToast }) {
                 {language === 'ar' ? 'حذف' : language === 'fr' ? 'Supprimer' : 'Delete'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white z-50 animate-slide-in ${
+          toast.type === 'success' ? 'bg-green-500' :
+          toast.type === 'error' ? 'bg-red-500' :
+          toast.type === 'warning' ? 'bg-yellow-500' :
+          'bg-blue-500'
+        }`}>
+          <div className="flex items-center gap-3">
+            {toast.type === 'success' && <CheckCircle className="w-5 h-5" />}
+            {toast.type === 'error' && <XCircle className="w-5 h-5" />}
+            <span>{toast.message}</span>
+            <button onClick={() => setToast(null)}>
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}

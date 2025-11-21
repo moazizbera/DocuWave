@@ -18,9 +18,10 @@ public sealed class TenantService : ITenantService
 
     public async Task<TenantDetailDto> CreateAsync(CreateTenantRequest request, CancellationToken cancellationToken)
     {
+        var tanantId = Guid.NewGuid();
         var tenant = new Tenant
         {
-            Id = Guid.NewGuid(),
+            Id = tanantId,
             TenantId = Guid.NewGuid().ToString(),
             Name = request.Name,
             Branding = new TenantBranding
@@ -34,7 +35,7 @@ public sealed class TenantService : ITenantService
                 Id = Guid.NewGuid(),
                 Key = feature,
                 Enabled = true,
-                TenantId = tenant.Id
+                TenantId = tanantId
             }).ToList(),
             CreatedAt = DateTime.UtcNow,
             CreatedBy = "system"

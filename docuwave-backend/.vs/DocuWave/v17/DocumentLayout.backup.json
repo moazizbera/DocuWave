@@ -1,0 +1,86 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "F:\\Projects\\ECM Projects\\docuwave\\docuwave-backend\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{79FF539C-0F1D-497E-ACF1-BDEC09C1ED6C}|src\\DocuWave.Api\\DocuWave.Api.csproj|f:\\projects\\ecm projects\\docuwave\\docuwave-backend\\src\\docuwave.api\\docuwave.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{79FF539C-0F1D-497E-ACF1-BDEC09C1ED6C}|src\\DocuWave.Api\\DocuWave.Api.csproj|solutionrelative:src\\docuwave.api\\docuwave.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{12D18438-5F3E-4A24-9C31-8AC30B190DAA}|tests\\DocuWave.IntegrationTests\\DocuWave.IntegrationTests.csproj|f:\\projects\\ecm projects\\docuwave\\docuwave-backend\\tests\\docuwave.integrationtests\\docuwave.integrationtests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{12D18438-5F3E-4A24-9C31-8AC30B190DAA}|tests\\DocuWave.IntegrationTests\\DocuWave.IntegrationTests.csproj|solutionrelative:tests\\docuwave.integrationtests\\docuwave.integrationtests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FF4B31F6-B644-415E-B404-758ACB50010F}|src\\DocuWave.Infrastructure\\DocuWave.Infrastructure.csproj|f:\\projects\\ecm projects\\docuwave\\docuwave-backend\\src\\docuwave.infrastructure\\storage\\localblobstorageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FF4B31F6-B644-415E-B404-758ACB50010F}|src\\DocuWave.Infrastructure\\DocuWave.Infrastructure.csproj|solutionrelative:src\\docuwave.infrastructure\\storage\\localblobstorageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FF4B31F6-B644-415E-B404-758ACB50010F}|src\\DocuWave.Infrastructure\\DocuWave.Infrastructure.csproj|f:\\projects\\ecm projects\\docuwave\\docuwave-backend\\src\\docuwave.infrastructure\\services\\tenantservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FF4B31F6-B644-415E-B404-758ACB50010F}|src\\DocuWave.Infrastructure\\DocuWave.Infrastructure.csproj|solutionrelative:src\\docuwave.infrastructure\\services\\tenantservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DocuWave.Api.csproj",
+              "DocumentMoniker": "F:\\Projects\\ECM Projects\\docuwave\\docuwave-backend\\src\\DocuWave.Api\\DocuWave.Api.csproj",
+              "RelativeDocumentMoniker": "src\\DocuWave.Api\\DocuWave.Api.csproj",
+              "ToolTip": "F:\\Projects\\ECM Projects\\docuwave\\docuwave-backend\\src\\DocuWave.Api\\DocuWave.Api.csproj",
+              "RelativeToolTip": "src\\DocuWave.Api\\DocuWave.Api.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-17T08:19:10.216Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DocuWave.IntegrationTests.csproj",
+              "DocumentMoniker": "F:\\Projects\\ECM Projects\\docuwave\\docuwave-backend\\tests\\DocuWave.IntegrationTests\\DocuWave.IntegrationTests.csproj",
+              "RelativeDocumentMoniker": "tests\\DocuWave.IntegrationTests\\DocuWave.IntegrationTests.csproj",
+              "ToolTip": "F:\\Projects\\ECM Projects\\docuwave\\docuwave-backend\\tests\\DocuWave.IntegrationTests\\DocuWave.IntegrationTests.csproj",
+              "RelativeToolTip": "tests\\DocuWave.IntegrationTests\\DocuWave.IntegrationTests.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-12T19:51:17.007Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TenantService.cs",
+              "DocumentMoniker": "F:\\Projects\\ECM Projects\\docuwave\\docuwave-backend\\src\\DocuWave.Infrastructure\\Services\\TenantService.cs",
+              "RelativeDocumentMoniker": "src\\DocuWave.Infrastructure\\Services\\TenantService.cs",
+              "ToolTip": "F:\\Projects\\ECM Projects\\docuwave\\docuwave-backend\\src\\DocuWave.Infrastructure\\Services\\TenantService.cs",
+              "RelativeToolTip": "src\\DocuWave.Infrastructure\\Services\\TenantService.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAD4vyUAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-12T19:47:27.263Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "LocalBlobStorageService.cs",
+              "DocumentMoniker": "F:\\Projects\\ECM Projects\\docuwave\\docuwave-backend\\src\\DocuWave.Infrastructure\\Storage\\LocalBlobStorageService.cs",
+              "RelativeDocumentMoniker": "src\\DocuWave.Infrastructure\\Storage\\LocalBlobStorageService.cs",
+              "ToolTip": "F:\\Projects\\ECM Projects\\docuwave\\docuwave-backend\\src\\DocuWave.Infrastructure\\Storage\\LocalBlobStorageService.cs",
+              "RelativeToolTip": "src\\DocuWave.Infrastructure\\Storage\\LocalBlobStorageService.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAlwAwAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-12T19:47:12.179Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "dgSpecHash": "uVbiohwL40E=",
+  "success": true,
+  "projectFilePath": "F:\\Projects\\ECM Projects\\docuwave\\docuwave-backend\\src\\DocuWave.Application\\DocuWave.Application.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Device\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
+    "C:\\Users\\Device\\.nuget\\packages\\fluentvalidation\\11.9.0\\fluentvalidation.11.9.0.nupkg.sha512",
+    "C:\\Users\\Device\\.nuget\\packages\\mediatr\\11.1.0\\mediatr.11.1.0.nupkg.sha512",
+    "C:\\Users\\Device\\.nuget\\packages\\mediatr.contracts\\1.0.1\\mediatr.contracts.1.0.1.nupkg.sha512",
+    "C:\\Users\\Device\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.2.0\\microsoft.aspnetcore.http.abstractions.2.2.0.nupkg.sha512",
+    "C:\\Users\\Device\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.2.0\\microsoft.aspnetcore.http.features.2.2.0.nupkg.sha512",
+    "C:\\Users\\Device\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
+    "C:\\Users\\Device\\.nuget\\packages\\microsoft.extensions.primitives\\2.2.0\\microsoft.extensions.primitives.2.2.0.nupkg.sha512",
+    "C:\\Users\\Device\\.nuget\\packages\\system.memory\\4.5.1\\system.memory.4.5.1.nupkg.sha512",
+    "C:\\Users\\Device\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.1\\system.runtime.compilerservices.unsafe.4.5.1.nupkg.sha512",
+    "C:\\Users\\Device\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512"
+  ],
+  "logs": []
+}

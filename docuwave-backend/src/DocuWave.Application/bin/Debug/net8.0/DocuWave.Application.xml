@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DocuWave.Application</name>
+    </assembly>
+    <members>
+        <member name="T:DocuWave.Application.AssemblyMarker">
+            <summary>
+            Empty marker used for assembly scanning when wiring dependencies.
+            </summary>
+        </member>
+    </members>
+</doc>

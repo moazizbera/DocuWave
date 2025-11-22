@@ -1,5 +1,5 @@
 import React from 'react';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 const AUTH_TOKEN_KEY = 'docuwave_token';
 const AUTH_USER_KEY = 'docuwave_user';

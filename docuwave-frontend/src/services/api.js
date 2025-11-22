@@ -298,8 +298,15 @@ const apiService = {
   async markNotificationRead(id) {
     return request(`/api/notifications/${id}/read`, { method: 'POST' });
   },
+  /** Authentication helpers */
+  auth: {
+    async login(payload) {
+      return request('/api/auth/login', { method: 'POST', body: payload });
+    }
+  },
   /** Create SignalR hub connection */
   createHubConnection
 };
 
+export { apiService };
 export default apiService;

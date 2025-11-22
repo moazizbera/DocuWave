@@ -15,22 +15,10 @@ import Sidebar from './components/layout/Sidebar';
 import Toast from './components/common/Toast';
 import OrgHierarchySystem from './components/common/OrgHierarchySystem';
 import WorkflowTemplateLibrary from './components/common/WorkflowTemplateLibrary';
+import NotificationCenter from './components/common/NotificationCenter';
+import OrganizationManager from './pages/OrganizationManager';
+import apiService, { setAuthContext } from './services/api';
 
-// ✅ IMPORT SERVICES
-import { apiService } from './services/api';
-
-/**
- * 🏢 DOCUWAVE SYSTEM - MAIN APPLICATION
- * ======================================
- * Central application component that:
- * - Manages application state (documents, schemes, current tab)
- * - Handles tenant selection
- * - Routes between different modules
- * - Provides toast notifications
- * - Uses ALL contexts properly (Org, Language, Theme)
- * 
- * @component
- */
 function DocuWaveSystem() {
   const { orgStructure } = useOrg();
   const { language, setLanguage, isRTL } = useLanguage();
@@ -183,11 +171,7 @@ function DocuWaveSystem() {
 
         {activeTab === 'repositories' && <Repositories showToast={showToast} />}
 
-        {activeTab === 'org-hierarchy' && (
-          <OrgHierarchySystem 
-            showToast={showToast}
-          />
-        )}
+        {activeTab === 'org-hierarchy' && <OrgHierarchySystem showToast={showToast} />}
 
         {activeTab === 'workflow-tracker' && <WorkflowExecutionTracker showToast={showToast} />}
 

@@ -4,6 +4,7 @@
   "private": true,
   "description": "DocuWave - Enterprise Content Management Platform",
   "dependencies": {
+    "@microsoft/signalr": "^8.0.5",
     "@testing-library/react": "file:vendor/testing-library-react",
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",

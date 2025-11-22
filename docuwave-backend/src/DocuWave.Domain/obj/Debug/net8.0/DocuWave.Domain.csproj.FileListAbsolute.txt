@@ -1,0 +1,14 @@
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\bin\Debug\net8.0\DocuWave.Domain.deps.json
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\bin\Debug\net8.0\DocuWave.Domain.dll
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\bin\Debug\net8.0\DocuWave.Domain.pdb
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\bin\Debug\net8.0\DocuWave.Domain.xml
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\obj\Debug\net8.0\DocuWave.Domain.GeneratedMSBuildEditorConfig.editorconfig
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\obj\Debug\net8.0\DocuWave.Domain.AssemblyInfoInputs.cache
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\obj\Debug\net8.0\DocuWave.Domain.AssemblyInfo.cs
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\obj\Debug\net8.0\DocuWave.Domain.csproj.CoreCompileInputs.cache
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\obj\Debug\net8.0\DocuWave.Domain.sourcelink.json
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\obj\Debug\net8.0\DocuWave.Domain.dll
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\obj\Debug\net8.0\refint\DocuWave.Domain.dll
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\obj\Debug\net8.0\DocuWave.Domain.xml
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\obj\Debug\net8.0\DocuWave.Domain.pdb
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Domain\obj\Debug\net8.0\ref\DocuWave.Domain.dll

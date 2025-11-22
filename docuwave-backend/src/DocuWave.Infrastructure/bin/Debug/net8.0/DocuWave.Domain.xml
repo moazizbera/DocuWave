@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DocuWave.Domain</name>
+    </assembly>
+    <members>
+        <member name="T:DocuWave.Domain.Entities.BaseEntity">
+            <summary>
+            Base type for aggregate roots and entities with common audit properties.
+            </summary>
+        </member>
+    </members>
+</doc>

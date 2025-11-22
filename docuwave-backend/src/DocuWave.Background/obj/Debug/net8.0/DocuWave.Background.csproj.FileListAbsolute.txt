@@ -1,0 +1,6 @@
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Background\obj\Debug\net8.0\DocuWave.Background.csproj.AssemblyReference.cache
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Background\obj\Debug\net8.0\DocuWave.Background.GeneratedMSBuildEditorConfig.editorconfig
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Background\obj\Debug\net8.0\DocuWave.Background.AssemblyInfoInputs.cache
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Background\obj\Debug\net8.0\DocuWave.Background.AssemblyInfo.cs
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Background\obj\Debug\net8.0\DocuWave.Background.csproj.CoreCompileInputs.cache
+F:\Projects\ECM Projects\docuwave\docuwave-backend\src\DocuWave.Background\obj\Debug\net8.0\DocuWave.Background.sourcelink.json
